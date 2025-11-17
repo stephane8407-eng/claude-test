@@ -1,0 +1,13 @@
+# Wikipedia Battle List URLs
+# One URL per line. Lines starting with # are ignored.
+
+# Medieval battles (1401-1500)
+https://en.wikipedia.org/wiki/List_of_battles_1401–1500
+
+# Additional battle lists to add:
+# https://en.wikipedia.org/wiki/List_of_battles_1301–1400
+# https://en.wikipedia.org/wiki/List_of_battles_1501–1600
+# https://en.wikipedia.org/wiki/List_of_battles_1601–1700
+# https://en.wikipedia.org/wiki/List_of_battles_1701–1800
+# https://en.wikipedia.org/wiki/List_of_battles_1801–1900
+# https://en.wikipedia.org/wiki/List_of_battles_1901–2000
