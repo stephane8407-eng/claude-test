@@ -1,0 +1,4 @@
+# Test pages - Wikipedia page titles for API scraper
+List_of_battles_1401–1500
+List_of_battles_1701–1800
+List_of_battles_1914–1918

@@ -1,0 +1,4 @@
+# Test scrape - 3 battle lists from different eras
+https://en.wikipedia.org/wiki/List_of_battles_1401%E2%80%931500
+https://en.wikipedia.org/wiki/List_of_battles_1701%E2%80%931800
+https://en.wikipedia.org/wiki/List_of_battles_1914%E2%80%931918
