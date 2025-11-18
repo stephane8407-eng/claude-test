@@ -258,9 +258,19 @@ class AILedVillageScraper:
         )
 
         result['intelligence'] = intelligence
+
+        # Handle treasure_probability whether it's an int or dict
+        treasure_prob = intelligence.get('treasure_probability', {})
+        if isinstance(treasure_prob, dict):
+            prob_score = treasure_prob.get('overall_score', 'N/A')
+        elif isinstance(treasure_prob, (int, float)):
+            prob_score = treasure_prob
+        else:
+            prob_score = 'N/A'
+
         result['phases']['phase6_final_processing'] = {
             'total_text_chars': len(final_text),
-            'treasure_probability': intelligence.get('treasure_probability', {}).get('overall_score', 'N/A')
+            'treasure_probability': prob_score
         }
 
         # Final stats
@@ -280,7 +290,7 @@ class AILedVillageScraper:
         print(f"Claude calls: {self.claude_calls}")
         print(f"Text: {len(final_text):,} chars")
         print(f"Iterations: {iteration}")
-        print(f"Treasure probability: {intelligence.get('treasure_probability', {}).get('overall_score', 'N/A')}/100")
+        print(f"Treasure probability: {prob_score}/100")
 
         return result
 
@@ -624,11 +634,27 @@ Return ONLY valid JSON."""
             intelligence = json.loads(json_str)
             intelligence['status'] = 'success'
 
-            prob = intelligence.get('treasure_probability', {}).get('overall_score', 'N/A')
+            # Handle treasure_probability whether it's an int or dict
+            treasure_prob = intelligence.get('treasure_probability', {})
+            if isinstance(treasure_prob, dict):
+                prob = treasure_prob.get('overall_score', 'N/A')
+            elif isinstance(treasure_prob, (int, float)):
+                prob = treasure_prob
+            else:
+                prob = 'N/A'
+
             print(f"   ✅ Processing complete! Treasure probability: {prob}/100")
 
             return intelligence
 
+        except json.JSONDecodeError as e:
+            print(f"   ❌ JSON parsing error: {e}")
+            print(f"   Response preview: {response_text[:500]}...")
+            return {
+                'status': 'json_error',
+                'error': str(e),
+                'response_preview': response_text[:1000]
+            }
         except Exception as e:
             print(f"   ❌ Error in final processing: {e}")
             return {
@@ -857,7 +883,16 @@ Quality: 90% completeness (vs 70%)
 
     if 'intelligence' in result:
         intel = result['intelligence']
-        prob = intel.get('treasure_probability', {}).get('overall_score', 'N/A')
+
+        # Handle treasure_probability whether it's an int or dict
+        treasure_prob = intel.get('treasure_probability', {})
+        if isinstance(treasure_prob, dict):
+            prob = treasure_prob.get('overall_score', 'N/A')
+        elif isinstance(treasure_prob, (int, float)):
+            prob = treasure_prob
+        else:
+            prob = 'N/A'
+
         print(f"🎯 Treasure Probability: {prob}/100")
         print(f"📊 Claude API calls: {result['stats']['claude_api_calls']}")
         print(f"🔍 Total searches: {result['stats']['total_searches']}")
