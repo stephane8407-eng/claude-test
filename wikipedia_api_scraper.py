@@ -38,6 +38,24 @@ class WikipediaAPIBattleScraper:
         self.output_file = output_file
         self.battles = []
 
+    def normalize_page_title(self, page_title: str) -> str:
+        """
+        Normalize Wikipedia page title to use en-dashes.
+
+        Wikipedia uses en-dashes (–) not hyphens (-) in page names like:
+        "List_of_battles_1401–1500" NOT "List_of_battles_1401-1500"
+
+        Args:
+            page_title: Page title with regular hyphens or en-dashes
+
+        Returns:
+            Page title with en-dashes
+        """
+        # Replace regular hyphens between numbers with en-dashes
+        # Pattern: digit-hyphen-digit becomes digit-endash-digit
+        normalized = re.sub(r'(\d)-(\d)', r'\1–\2', page_title)
+        return normalized
+
     def fetch_page_html(self, page_title: str, max_retries: int = 3) -> Optional[str]:
         """
         Fetch Wikipedia page HTML using MediaWiki API.
@@ -49,6 +67,9 @@ class WikipediaAPIBattleScraper:
         Returns:
             Page HTML content or None if failed
         """
+        # Normalize page title to use en-dashes
+        page_title = self.normalize_page_title(page_title)
+
         params = {
             'action': 'parse',
             'page': page_title,
