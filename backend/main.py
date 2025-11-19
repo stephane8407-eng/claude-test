@@ -67,11 +67,11 @@ async def health_check():
 
 
 # Import and include routers
-# TODO: Uncomment when routes are created
-# from app.api import battles, places, users
-# app.include_router(battles.router, prefix="/api", tags=["battles"])
-# app.include_router(places.router, prefix="/api", tags=["places"])
-# app.include_router(users.router, prefix="/api", tags=["users"])
+from app.api.battles import router as battles_router
+from app.api.places import router as places_router
+
+app.include_router(battles_router)
+app.include_router(places_router)
 
 
 if __name__ == "__main__":
