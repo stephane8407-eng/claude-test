@@ -66,6 +66,17 @@ async def health_check():
     }
 
 
+@app.get("/api/cache/stats")
+async def get_cache_statistics():
+    """
+    Get cache performance statistics.
+
+    Returns cache hit/miss rates for monitoring performance.
+    """
+    from app.utils import get_cache_stats
+    return get_cache_stats()
+
+
 # Import and include routers
 from app.api.battles import router as battles_router
 from app.api.places import router as places_router
