@@ -15,7 +15,7 @@ from app.models import Battle
 router = APIRouter(prefix="/api/battles", tags=["battles"])
 
 
-@router.get("/", response_model=List[dict])
+@router.get("/")
 async def list_battles(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(100, ge=1, le=1000, description="Max records to return"),
@@ -26,6 +26,8 @@ async def list_battles(
 ):
     """
     List all battles with optional filtering.
+
+    Returns paginated response with metadata.
 
     Query parameters:
     - skip: Pagination offset
