@@ -80,9 +80,13 @@ async def get_cache_statistics():
 # Import and include routers
 from app.api.battles import router as battles_router
 from app.api.places import router as places_router
+from app.api.conflicts import router as conflicts_router
+from app.api.villages import router as villages_router
 
 app.include_router(battles_router)
 app.include_router(places_router)
+app.include_router(conflicts_router)
+app.include_router(villages_router)
 
 
 if __name__ == "__main__":
