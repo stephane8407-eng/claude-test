@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
+from pydantic import BaseModel
 from app.database import get_db
 from app.models import Village, IdentityCategory, IdentityTheme, VillageDataSnapshot
+from app.services.identity_generator import IdentityGenerator
 
 router = APIRouter()
 
@@ -103,3 +105,63 @@ def get_village_data_snapshot(
         raise HTTPException(status_code=404, detail="No data snapshot found for this village")
 
     return snapshot.to_dict()
+
+# =====================================
+# AI THEME GENERATION ENDPOINTS
+# =====================================
+
+class GenerateThemesRequest(BaseModel):
+    """Request body for generating identity themes"""
+    categories: Optional[List[str]] = None  # Category names (None = all categories)
+
+@router.post("/api/villages/{village_slug}/generate-identity", tags=["Identity", "AI"])
+def generate_identity_themes(
+    village_slug: str,
+    request: GenerateThemesRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Generate AI identity themes for a village
+
+    This endpoint uses Claude AI to analyze village data and generate
+    compelling identity themes based on conflicts, POIs, and computed scores.
+    """
+    # Validate village exists
+    village = db.query(Village).filter(Village.slug == village_slug).first()
+    if not village:
+        raise HTTPException(status_code=404, detail="Village not found")
+
+    # Check if data snapshot exists
+    snapshot = db.query(VillageDataSnapshot).filter(
+        VillageDataSnapshot.village_id == village.id
+    ).order_by(VillageDataSnapshot.snapshot_date.desc()).first()
+
+    if not snapshot:
+        raise HTTPException(
+            status_code=400,
+            detail=f"No data snapshot found for {village.name}. Please create a data snapshot first."
+        )
+
+    # Initialize generator
+    try:
+        generator = IdentityGenerator()
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    # Generate and save themes
+    try:
+        themes = generator.generate_and_save_themes(
+            db=db,
+            village_slug=village_slug,
+            category_names=request.categories
+        )
+
+        return {
+            "success": True,
+            "village": village.to_dict(),
+            "themes_generated": len(themes),
+            "themes": [theme.to_dict() for theme in themes]
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating themes: {str(e)}")
