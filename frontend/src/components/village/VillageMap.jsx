@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import axios from 'axios';
+import api from '../../services/api';
 
 // Fix for default marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -28,10 +28,11 @@ export function VillageMap({ villageSlug, pois = [], center, showConflicts = tru
 
   const loadConflicts = async () => {
     try {
-      const response = await axios.get(`/api/villages/${villageSlug}/conflicts`);
+      const response = await api.get(`/api/villages/${villageSlug}/conflicts`);
       // Ensure we always set an array
       const conflictsData = Array.isArray(response.data) ? response.data : [];
       setConflicts(conflictsData);
+      console.log(`Loaded ${conflictsData.length} conflicts for ${villageSlug}`);
     } catch (error) {
       console.error('Failed to load conflicts:', error);
       setConflicts([]); // Set empty array on error
