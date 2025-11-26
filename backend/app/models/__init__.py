@@ -8,6 +8,8 @@ from app.models.user import User
 from app.models.usage_event import UsageEvent
 from app.models.local_conflict import LocalConflict
 from app.models.village import Village
+from app.models.poi_type import POIType
+from app.models.poi import POI
 
 __all__ = [
     "Battle",
@@ -17,4 +19,6 @@ __all__ = [
     "UsageEvent",
     "LocalConflict",
     "Village",
+    "POIType",
+    "POI",
 ]
