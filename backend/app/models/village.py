@@ -35,9 +35,6 @@ class Village(Base):
     # Settings (flexible JSON)
     settings = Column(JSONB, default={})
 
-    # Identity themes (from AI analysis)
-    identity_themes = Column(JSONB)
-
     # Metadata
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
@@ -45,6 +42,10 @@ class Village(Base):
     # Relationships (add later when ready)
     # conflicts = relationship("LocalConflict", back_populates="village")
     # places = relationship("Place", back_populates="village")
+
+    # Week 3: Identity Engine relationships
+    identity_themes = relationship("IdentityTheme", back_populates="village")
+    data_snapshots = relationship("VillageDataSnapshot", back_populates="village")
 
     def to_dict(self):
         """Convert to dictionary for API responses"""
@@ -63,7 +64,6 @@ class Village(Base):
             'subscription_tier': self.subscription_tier,
             'subscription_status': self.subscription_status,
             'settings': self.settings or {},
-            'identity_themes': self.identity_themes,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 

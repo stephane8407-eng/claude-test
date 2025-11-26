@@ -10,6 +10,9 @@ from app.models.local_conflict import LocalConflict
 from app.models.village import Village
 from app.models.poi_type import POIType
 from app.models.poi import POI
+from app.models.identity_category import IdentityCategory
+from app.models.identity_theme import IdentityTheme
+from app.models.village_data_snapshot import VillageDataSnapshot
 
 __all__ = [
     "Battle",
@@ -21,4 +24,7 @@ __all__ = [
     "Village",
     "POIType",
     "POI",
+    "IdentityCategory",
+    "IdentityTheme",
+    "VillageDataSnapshot",
 ]
