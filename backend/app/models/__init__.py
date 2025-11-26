@@ -15,6 +15,9 @@ from app.models.poi import POI
 from app.models.identity_category import IdentityCategory
 from app.models.identity_theme import IdentityTheme
 from app.models.village_data_snapshot import VillageDataSnapshot
+from app.models.role import Role
+from app.models.permission import Permission
+from app.models.role_permission import RolePermission
 
 __all__ = [
     "Battle",
@@ -31,4 +34,7 @@ __all__ = [
     "IdentityCategory",
     "IdentityTheme",
     "VillageDataSnapshot",
+    "Role",
+    "Permission",
+    "RolePermission",
 ]

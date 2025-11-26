@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import BaseModel
 from app.database import get_db
-from app.models import Village, IdentityCategory, IdentityTheme, VillageDataSnapshot
+from app.models import Village, IdentityCategory, IdentityTheme, VillageDataSnapshot, User
 from app.services.identity_generator import IdentityGenerator
+from app.middleware.permissions import require_permission, require_tier, can_access_village
 
 router = APIRouter()
 
@@ -118,18 +119,25 @@ class GenerateThemesRequest(BaseModel):
 def generate_identity_themes(
     village_slug: str,
     request: GenerateThemesRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_permission("can_generate_identity"))
 ):
     """
     Generate AI identity themes for a village
 
     This endpoint uses Claude AI to analyze village data and generate
     compelling identity themes based on conflicts, POIs, and computed scores.
+
+    Requires: can_generate_identity permission
     """
     # Validate village exists
     village = db.query(Village).filter(Village.slug == village_slug).first()
     if not village:
         raise HTTPException(status_code=404, detail="Village not found")
+
+    # Verify village access (admins can access any village, others only their own)
+    if not can_access_village(current_user, village):
+        raise HTTPException(status_code=403, detail="You do not have access to this village")
 
     # Check if data snapshot exists
     snapshot = db.query(VillageDataSnapshot).filter(

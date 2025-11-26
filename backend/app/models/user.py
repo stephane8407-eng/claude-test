@@ -16,7 +16,9 @@ class User(Base):
 
     # User role and village association
     role = Column(String(20), server_default='user', index=True, nullable=False)
-    # Roles: 'admin' (system admin), 'village_admin' (village manager), 'user' (regular user)
+    # Legacy role column - kept for backward compatibility
+    role_id = Column(Integer, ForeignKey('roles.id'), nullable=True, index=True)
+    # New role_id for RBAC system
     village_id = Column(Integer, ForeignKey('villages.id'), nullable=True, index=True)
     # village_id is NULL for system admins, set for village admins
 
@@ -34,6 +36,7 @@ class User(Base):
 
     # Relationships
     village = relationship("Village", backref="users")
+    role_obj = relationship("Role", back_populates="users")
     api_keys = relationship("APIKey", back_populates="user", cascade="all, delete-orphan")
     password_reset_tokens = relationship("PasswordResetToken", back_populates="user", cascade="all, delete-orphan")
 
