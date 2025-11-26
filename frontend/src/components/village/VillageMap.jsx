@@ -41,11 +41,9 @@ export function VillageMap({ villageSlug, pois = [], center, showConflicts = tru
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Initialize map
-    const map = L.map(mapRef.current).setView(
-      center ? [center.lat, center.lng] : [48.8566, 2.3522],
-      13
-    );
+    // Initialize map with village center or fallback to default
+    const mapCenter = center ? [center.lat, center.lng] : [46.2276, 2.2137]; // Default to France center
+    const map = L.map(mapRef.current).setView(mapCenter, 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'

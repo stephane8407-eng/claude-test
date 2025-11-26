@@ -123,7 +123,7 @@ export function VillagePage() {
             <VillageMap
               villageSlug={slug}
               pois={pois}
-              center={village.location}
+              center={{ lat: village.latitude, lng: village.longitude }}
               showConflicts={true}
               showPOIs={true}
             />
