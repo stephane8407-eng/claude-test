@@ -45,20 +45,26 @@ export function ConflictTimeline({ villageSlug }) {
   const loadConflicts = async () => {
     try {
       const response = await axios.get(`/api/villages/${villageSlug}/conflicts`);
-      setConflicts(response.data);
+      // Ensure we always set an array
+      const conflictsData = Array.isArray(response.data) ? response.data : [];
+      setConflicts(conflictsData);
     } catch (error) {
       console.error('Failed to load conflicts:', error);
+      setConflicts([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
   };
 
-  const groupedConflicts = conflicts.reduce((acc, conflict) => {
-    const period = getPeriodFromYear(conflict.start_year);
-    if (!acc[period]) acc[period] = [];
-    acc[period].push(conflict);
-    return acc;
-  }, {});
+  // Ensure conflicts is an array before reducing
+  const groupedConflicts = Array.isArray(conflicts)
+    ? conflicts.reduce((acc, conflict) => {
+        const period = getPeriodFromYear(conflict.start_year);
+        if (!acc[period]) acc[period] = [];
+        acc[period].push(conflict);
+        return acc;
+      }, {})
+    : {};
 
   const filteredPeriods = selectedPeriod
     ? { [selectedPeriod]: groupedConflicts[selectedPeriod] || [] }
@@ -195,7 +201,7 @@ export function ConflictTimeline({ villageSlug }) {
         </div>
       </div>
 
-      {conflicts.length === 0 && (
+      {Array.isArray(conflicts) && conflicts.length === 0 && !loading && (
         <div className="text-center py-12 bg-white rounded-lg">
           <p className="text-gray-500">No conflicts found for this village.</p>
         </div>
