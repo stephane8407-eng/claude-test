@@ -120,7 +120,7 @@ def generate_identity_themes(
     village_slug: str,
     request: GenerateThemesRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_permission("can_generate_identity"))
+    current_user: User = require_permission("can_generate_identity")
 ):
     """
     Generate AI identity themes for a village
