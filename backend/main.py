@@ -84,6 +84,7 @@ from app.api.conflicts import router as conflicts_router
 from app.api.villages import router as villages_router
 from app.api.pois import router as pois_router
 from app.api import identity
+from app.api.auth import router as auth_router
 
 app.include_router(battles_router)
 app.include_router(places_router)
@@ -91,6 +92,7 @@ app.include_router(conflicts_router)
 app.include_router(villages_router)
 app.include_router(pois_router)
 app.include_router(identity.router)
+app.include_router(auth_router)
 
 
 if __name__ == "__main__":

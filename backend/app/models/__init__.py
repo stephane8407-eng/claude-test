@@ -5,6 +5,8 @@ from app.models.battle import Battle
 from app.models.place import Place
 from app.models.place_context import PlaceContext
 from app.models.user import User
+from app.models.api_key import APIKey
+from app.models.password_reset_token import PasswordResetToken
 from app.models.usage_event import UsageEvent
 from app.models.local_conflict import LocalConflict
 from app.models.village import Village
@@ -19,6 +21,8 @@ __all__ = [
     "Place",
     "PlaceContext",
     "User",
+    "APIKey",
+    "PasswordResetToken",
     "UsageEvent",
     "LocalConflict",
     "Village",
