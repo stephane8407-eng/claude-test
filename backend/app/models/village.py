@@ -47,6 +47,10 @@ class Village(Base):
     identity_themes = relationship("IdentityTheme", back_populates="village")
     data_snapshots = relationship("VillageDataSnapshot", back_populates="village")
 
+    # Week 10: QR Code relationships
+    qr_codes = relationship("QRCode", back_populates="village")
+    qr_routes = relationship("QRRoute", back_populates="village")
+
     def to_dict(self):
         """Convert to dictionary for API responses"""
         return {

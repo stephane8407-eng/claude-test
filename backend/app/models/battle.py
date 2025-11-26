@@ -2,6 +2,7 @@
 Battle model - LAYER 0: Historical battles across FR, UK, BE
 """
 from sqlalchemy import Column, Integer, String, Date, DECIMAL, ARRAY, Text, TIMESTAMP
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from geoalchemy2 import Geometry
 from app.database import Base
@@ -28,6 +29,9 @@ class Battle(Base):
 
     # PostGIS geometry column (automatically created by index in schema)
     # We'll use lat/lng directly in queries with ST_MakePoint
+
+    # Week 10: QR Code relationship
+    qr_codes = relationship("QRCode", back_populates="battle")
 
     def __repr__(self):
         return f"<Battle(id={self.id}, name='{self.name}', period='{self.war_period}')>"

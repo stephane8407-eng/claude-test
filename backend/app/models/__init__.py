@@ -18,6 +18,9 @@ from app.models.village_data_snapshot import VillageDataSnapshot
 from app.models.role import Role
 from app.models.permission import Permission
 from app.models.role_permission import RolePermission
+from app.models.qr_code import QRCode
+from app.models.qr_scan import QRScan
+from app.models.qr_route import QRRoute
 
 __all__ = [
     "Battle",
@@ -37,4 +40,7 @@ __all__ = [
     "Role",
     "Permission",
     "RolePermission",
+    "QRCode",
+    "QRScan",
+    "QRRoute",
 ]

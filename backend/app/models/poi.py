@@ -45,6 +45,9 @@ class POI(Base):
     # village = relationship("Village", back_populates="pois")
     # poi_type = relationship("POIType", back_populates="pois")
 
+    # Week 10: QR Code relationship
+    qr_codes = relationship("QRCode", back_populates="poi")
+
     def to_dict(self):
         """Convert to dictionary for API responses"""
         return {
