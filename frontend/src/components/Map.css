@@ -186,22 +186,34 @@
 }
 
 /* Popup styling */
-.battle-popup-container .mapboxgl-popup-content {
+.battle-popup-container .mapboxgl-popup-content,
+.conflict-popup-container .mapboxgl-popup-content {
   padding: 16px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   max-width: 320px;
 }
 
-.battle-popup-container .mapboxgl-popup-close-button {
+.conflict-popup-container .mapboxgl-popup-content {
+  max-width: 380px;
+}
+
+.battle-popup-container .mapboxgl-popup-close-button,
+.conflict-popup-container .mapboxgl-popup-close-button {
   font-size: 20px;
   padding: 4px 8px;
   color: #6b7280;
 }
 
-.battle-popup-container .mapboxgl-popup-close-button:hover {
+.battle-popup-container .mapboxgl-popup-close-button:hover,
+.conflict-popup-container .mapboxgl-popup-close-button:hover {
   background-color: #f3f4f6;
   color: #1f2937;
+}
+
+/* Conflict marker styling */
+.conflict-marker {
+  background-color: #f97316;
 }
 
 /* Responsive design for mobile */
@@ -240,9 +252,14 @@
     height: 20px;
   }
 
-  .battle-popup-container .mapboxgl-popup-content {
+  .battle-popup-container .mapboxgl-popup-content,
+  .conflict-popup-container .mapboxgl-popup-content {
     padding: 12px;
     max-width: 280px;
+  }
+
+  .conflict-popup-container .mapboxgl-popup-content {
+    max-width: 320px;
   }
 
   .error-overlay {
@@ -290,15 +307,18 @@
     color: #d1d5db;
   }
 
-  .battle-popup-container .mapboxgl-popup-content {
+  .battle-popup-container .mapboxgl-popup-content,
+  .conflict-popup-container .mapboxgl-popup-content {
     background-color: #1f2937;
   }
 
-  .battle-popup-container .mapboxgl-popup-close-button {
+  .battle-popup-container .mapboxgl-popup-close-button,
+  .conflict-popup-container .mapboxgl-popup-close-button {
     color: #9ca3af;
   }
 
-  .battle-popup-container .mapboxgl-popup-close-button:hover {
+  .battle-popup-container .mapboxgl-popup-close-button:hover,
+  .conflict-popup-container .mapboxgl-popup-close-button:hover {
     background-color: #374151;
     color: #f3f4f6;
   }

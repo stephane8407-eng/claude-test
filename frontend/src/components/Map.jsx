@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import MapGL, { Marker, Popup, NavigationControl, ScaleControl, FullscreenControl } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import BattlePopup from './BattlePopup';
+import ConflictPopup from './ConflictPopup';
 import './Map.css';
 
 // Mapbox access token
@@ -30,7 +31,9 @@ const Map = () => {
   });
 
   const [battles, setBattles] = useState([]);
+  const [conflicts, setConflicts] = useState([]);
   const [selectedBattle, setSelectedBattle] = useState(null);
+  const [selectedConflict, setSelectedConflict] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -59,13 +62,42 @@ const Map = () => {
     fetchBattles();
   }, []);
 
+  // Fetch conflicts from API
+  useEffect(() => {
+    const fetchConflicts = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/conflicts/?limit=1000');
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setConflicts(data.results || []);
+      } catch (err) {
+        console.error('Failed to fetch conflicts:', err);
+        // Don't set error state here - conflicts are optional
+      }
+    };
+
+    fetchConflicts();
+  }, []);
+
   const handleMarkerClick = useCallback((battle, e) => {
     e.originalEvent.stopPropagation();
     setSelectedBattle(battle);
+    setSelectedConflict(null);
+  }, []);
+
+  const handleConflictMarkerClick = useCallback((conflict, e) => {
+    e.originalEvent.stopPropagation();
+    setSelectedConflict(conflict);
+    setSelectedBattle(null);
   }, []);
 
   const handleClosePopup = useCallback(() => {
     setSelectedBattle(null);
+    setSelectedConflict(null);
   }, []);
 
   return (
@@ -105,7 +137,7 @@ const Map = () => {
         {/* Battle markers */}
         {battles.map((battle) => (
           <Marker
-            key={battle.id}
+            key={`battle-${battle.id}`}
             longitude={battle.longitude}
             latitude={battle.latitude}
             anchor="bottom"
@@ -124,7 +156,29 @@ const Map = () => {
           </Marker>
         ))}
 
-        {/* Popup */}
+        {/* Conflict markers (AI-scraped, shown in red) */}
+        {conflicts.map((conflict) => (
+          <Marker
+            key={`conflict-${conflict.id}`}
+            longitude={conflict.longitude}
+            latitude={conflict.latitude}
+            anchor="bottom"
+            onClick={(e) => handleConflictMarkerClick(conflict, e)}
+          >
+            <div
+              className="marker-pin conflict-marker"
+              style={{
+                backgroundColor: '#f97316',
+                cursor: 'pointer'
+              }}
+              title={conflict.name}
+            >
+              <div className="marker-pulse" style={{ borderColor: '#f97316' }} />
+            </div>
+          </Marker>
+        ))}
+
+        {/* Battle Popup */}
         {selectedBattle && (
           <Popup
             longitude={selectedBattle.longitude}
@@ -137,12 +191,26 @@ const Map = () => {
             <BattlePopup battle={selectedBattle} />
           </Popup>
         )}
+
+        {/* Conflict Popup */}
+        {selectedConflict && (
+          <Popup
+            longitude={selectedConflict.longitude}
+            latitude={selectedConflict.latitude}
+            anchor="top"
+            onClose={handleClosePopup}
+            closeOnClick={false}
+            className="conflict-popup-container"
+          >
+            <ConflictPopup conflict={selectedConflict} />
+          </Popup>
+        )}
       </MapGL>
 
-      {/* Battle count indicator */}
+      {/* Battle & Conflict count indicator */}
       {!loading && !error && (
         <div className="battle-count">
-          {battles.length} battles loaded
+          {battles.length} battles • {conflicts.length} conflicts loaded
         </div>
       )}
 
@@ -162,6 +230,18 @@ const Map = () => {
               <span>Other</span>
             </div>
           </div>
+
+          {conflicts.length > 0 && (
+            <>
+              <h4 style={{ marginTop: '16px' }}>AI Deep Analysis</h4>
+              <div className="legend-items">
+                <div className="legend-item">
+                  <div className="legend-color" style={{ backgroundColor: '#f97316' }}></div>
+                  <span>🔍 AI-Discovered Conflicts (Deep Analysis)</span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

@@ -2,3 +2,19 @@
 # Test CSV files
 test_*.csv
 *_geocoded.csv
+# Secrets
+.env
+backend/.env
+
+# Python
+venv/
+backend/venv/
+__pycache__/
+*.pyc
+
+# Mac
+.DS_Store
+
+# Data files (optional)
+*.csv
+*.json

@@ -25,7 +25,7 @@ class UsageEvent(Base):
     referrer = Column(String(500))  # Where did they come from?
 
     # Flexible data
-    metadata = Column(JSONB)  # Any additional event-specific data
+    event_metadata = Column(JSONB)  # Any additional event-specific data
 
     timestamp = Column(TIMESTAMP, server_default=func.now(), index=True)
 
