@@ -1,0 +1,219 @@
+# ============================================================================
+# SPV Treasure Map - Docker Compose (Production)
+# ============================================================================
+# Production environment with security hardening and nginx reverse proxy
+# Usage: docker-compose -f docker-compose.prod.yml up -d
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ==========================================================================
+  # PostgreSQL Database with PostGIS
+  # ==========================================================================
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: spv_postgres_prod
+    environment:
+      POSTGRES_DB: spv_treasure_map
+      POSTGRES_USER: spv_admin
+      # CRITICAL: Set strong password via .env file
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    # Don't expose port to host in production
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spv_admin -d spv_treasure_map"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - spv_network_internal
+    restart: always
+    # Security: read-only root filesystem
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  # ==========================================================================
+  # Redis Cache
+  # ==========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: spv_redis_prod
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    # Don't expose port to host in production
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--pass", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - spv_network_internal
+    restart: always
+
+  # ==========================================================================
+  # Backend API
+  # ==========================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: spv_backend_prod
+    environment:
+      # Environment
+      ENVIRONMENT: production
+      DEBUG: "false"
+      LOG_LEVEL: WARNING
+
+      # Server
+      HOST: 0.0.0.0
+      PORT: 8000
+      WORKERS: ${WORKERS:-4}
+
+      # Database
+      DATABASE_URL: postgresql://spv_admin:${POSTGRES_PASSWORD}@postgres:5432/spv_treasure_map
+
+      # Redis
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      CACHE_ENABLED: "true"
+
+      # Security
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      CSRF_ENABLED: "true"
+      CSRF_SECRET_KEY: ${CSRF_SECRET_KEY}
+
+      # CORS
+      CORS_ORIGINS: ${CORS_ORIGINS}
+
+      # Rate limiting
+      RATE_LIMIT_ENABLED: "true"
+
+      # Security headers
+      ENABLE_SECURITY_HEADERS: "true"
+
+      # Monitoring
+      SENTRY_ENABLED: ${SENTRY_ENABLED:-true}
+      SENTRY_DSN: ${SENTRY_DSN}
+      SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+
+      # API Keys
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_CSE_ID: ${GOOGLE_CSE_ID:-}
+    # Don't expose port to host - nginx will proxy
+    expose:
+      - "8000"
+    volumes:
+      # Persistent uploads
+      - uploads_data:/app/uploads
+      # Backups
+      - backups_data:/app/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/api/health/live').raise_for_status()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - spv_network_internal
+    restart: always
+    # Security: limit resources
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # ==========================================================================
+  # Nginx Reverse Proxy
+  # ==========================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: spv_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Nginx configuration
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      # SSL certificates (Let's Encrypt)
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - certbot_data:/var/www/certbot:ro
+      # Logs
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - spv_network_internal
+      - spv_network_external
+    restart: always
+
+  # ==========================================================================
+  # Certbot (Let's Encrypt SSL)
+  # ==========================================================================
+  certbot:
+    image: certbot/certbot:latest
+    container_name: spv_certbot_prod
+    volumes:
+      - ./nginx/ssl:/etc/letsencrypt
+      - certbot_data:/var/www/certbot
+    # Run certbot in renewal mode
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - spv_network_external
+    restart: always
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  # Internal network (backend, database, redis)
+  spv_network_internal:
+    driver: bridge
+    name: spv_internal_network
+    internal: true
+
+  # External network (nginx only)
+  spv_network_external:
+    driver: bridge
+    name: spv_external_network
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    name: spv_postgres_data_prod
+  redis_data:
+    name: spv_redis_data_prod
+  uploads_data:
+    name: spv_uploads_data_prod
+  backups_data:
+    name: spv_backups_data_prod
+  certbot_data:
+    name: spv_certbot_data_prod
+  nginx_logs:
+    name: spv_nginx_logs_prod

@@ -1,0 +1,140 @@
+# ============================================================================
+# SPV Treasure Map - Docker Compose (Development)
+# ============================================================================
+# Development environment with hot reloading and debug features
+# Usage: docker-compose up -d
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ==========================================================================
+  # PostgreSQL Database with PostGIS
+  # ==========================================================================
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: spv_postgres_dev
+    environment:
+      POSTGRES_DB: spv_treasure_map
+      POSTGRES_USER: spv_admin
+      POSTGRES_PASSWORD: DevPassword123
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spv_admin -d spv_treasure_map"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spv_network
+
+  # ==========================================================================
+  # Redis Cache
+  # ==========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: spv_redis_dev
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spv_network
+
+  # ==========================================================================
+  # Backend API
+  # ==========================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: spv_backend_dev
+    environment:
+      # Environment
+      ENVIRONMENT: development
+      DEBUG: "true"
+      LOG_LEVEL: DEBUG
+
+      # Server
+      HOST: 0.0.0.0
+      PORT: 8000
+
+      # Database (use docker service name)
+      DATABASE_URL: postgresql://spv_admin:DevPassword123@postgres:5432/spv_treasure_map
+
+      # Redis (use docker service name)
+      REDIS_URL: redis://redis:6379/0
+      CACHE_ENABLED: "true"
+
+      # Security (dev keys - NEVER use in production)
+      JWT_SECRET_KEY: dev_jwt_secret_key_change_in_production_at_least_32_chars
+      CSRF_ENABLED: "false"
+
+      # CORS (allow all for development)
+      CORS_ORIGINS: http://localhost:3000,http://localhost:8000,http://127.0.0.1:3000
+
+      # Rate limiting (disabled for dev)
+      RATE_LIMIT_ENABLED: "false"
+
+      # Security headers (disabled for dev)
+      ENABLE_SECURITY_HEADERS: "false"
+
+      # Monitoring (disabled for dev)
+      SENTRY_ENABLED: "false"
+
+      # API Keys (optional)
+      # ANTHROPIC_API_KEY: your_dev_key_here
+      # GOOGLE_API_KEY: your_dev_key_here
+      # GOOGLE_CSE_ID: your_dev_cse_id_here
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount code for hot reloading in development
+      - ./backend:/app:ro
+      # Persistent uploads
+      - uploads_data:/app/uploads
+      # Backups
+      - ./backend/backups:/app/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/api/health/live').raise_for_status()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - spv_network
+    restart: unless-stopped
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  spv_network:
+    driver: bridge
+    name: spv_treasure_map_network
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    name: spv_postgres_data_dev
+  redis_data:
+    name: spv_redis_data_dev
+  uploads_data:
+    name: spv_uploads_data_dev

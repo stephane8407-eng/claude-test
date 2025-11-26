@@ -1,0 +1,240 @@
+name: Test Suite
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  # ==========================================================================
+  # Linting and Code Quality
+  # ==========================================================================
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install flake8 black mypy
+          pip install -r requirements.txt
+
+      - name: Run Black (code formatter check)
+        run: |
+          cd backend
+          black --check app/
+
+      - name: Run flake8 (linter)
+        run: |
+          cd backend
+          flake8 app/ --max-line-length=120 --extend-ignore=E203,W503
+
+      - name: Run mypy (type checker)
+        run: |
+          cd backend
+          mypy app/ --ignore-missing-imports || true
+
+  # ==========================================================================
+  # Security Scanning
+  # ==========================================================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install safety
+        run: pip install safety
+
+      - name: Check for security vulnerabilities
+        run: |
+          cd backend
+          safety check --file requirements.txt --output text || true
+
+      - name: Run Bandit (security linter)
+        run: |
+          pip install bandit
+          cd backend
+          bandit -r app/ -f json -o bandit-report.json || true
+
+      - name: Upload Bandit report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: bandit-report
+          path: backend/bandit-report.json
+
+  # ==========================================================================
+  # Unit Tests
+  # ==========================================================================
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:15-3.3
+        env:
+          POSTGRES_DB: spv_treasure_map_test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client libpq-dev
+
+      - name: Install Python dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio
+
+      - name: Set up test environment
+        run: |
+          cd backend
+          cp .env.example .env
+          # Override with test database
+          echo "DATABASE_URL=postgresql://test_user:test_password@localhost:5432/spv_treasure_map_test" >> .env
+          echo "REDIS_URL=redis://localhost:6379/0" >> .env
+          echo "JWT_SECRET_KEY=test_jwt_secret_key_for_testing_only" >> .env
+          echo "ENVIRONMENT=development" >> .env
+
+      - name: Run Week 1 tests
+        run: |
+          cd backend
+          python ../scripts/week1_test_multi_tenancy.py
+
+      - name: Run Week 4 tests
+        run: |
+          cd backend
+          python ../scripts/week4_test_api.py
+
+      - name: Run Week 5 tests
+        run: |
+          python scripts/week5_test_auth.py
+
+      - name: Run Week 6 tests
+        run: |
+          python scripts/week6_test_authorization.py
+
+      - name: Run Week 7 tests
+        run: |
+          python scripts/week7_test_security.py
+
+      - name: Run Week 8 tests
+        run: |
+          python scripts/week8_test_monitoring.py
+
+      # - name: Run pytest tests (if you add pytest tests)
+      #   run: |
+      #     cd backend
+      #     pytest tests/ --cov=app --cov-report=xml --cov-report=html
+
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v3
+      #   if: always()
+      #   with:
+      #     files: ./backend/coverage.xml
+      #     flags: unittests
+      #     name: codecov-umbrella
+
+  # ==========================================================================
+  # Docker Build Test
+  # ==========================================================================
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+          tags: spv-treasure-map:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test Docker image
+        run: |
+          docker run --rm spv-treasure-map:test python --version
+
+  # ==========================================================================
+  # Summary
+  # ==========================================================================
+  summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [lint, security, test, docker]
+    if: always()
+
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.lint.result }}" = "success" ] && \
+             [ "${{ needs.security.result }}" = "success" ] && \
+             [ "${{ needs.test.result }}" = "success" ] && \
+             [ "${{ needs.docker.result }}" = "success" ]; then
+            echo "✅ All tests passed!"
+            exit 0
+          else
+            echo "❌ Some tests failed:"
+            echo "  Lint: ${{ needs.lint.result }}"
+            echo "  Security: ${{ needs.security.result }}"
+            echo "  Tests: ${{ needs.test.result }}"
+            echo "  Docker: ${{ needs.docker.result }}"
+            exit 1
+          fi
