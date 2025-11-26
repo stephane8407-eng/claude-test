@@ -118,27 +118,29 @@ export const villageAPI = {
 
 export const poiAPI = {
   list: async (villageSlug, params = {}) => {
-    const response = await api.get(`/api/villages/${villageSlug}/pois`, { params });
-    return response.data;
+    const response = await api.get(`/api/pois/`, {
+      params: { village_slug: villageSlug, ...params }
+    });
+    return response.data.results || [];
   },
 
   get: async (villageSlug, poiId) => {
-    const response = await api.get(`/api/villages/${villageSlug}/pois/${poiId}`);
+    const response = await api.get(`/api/pois/${poiId}`);
     return response.data;
   },
 
   create: async (villageSlug, data) => {
-    const response = await api.post(`/api/villages/${villageSlug}/pois`, data);
+    const response = await api.post(`/api/pois/`, data);
     return response.data;
   },
 
   update: async (villageSlug, poiId, data) => {
-    const response = await api.put(`/api/villages/${villageSlug}/pois/${poiId}`, data);
+    const response = await api.put(`/api/pois/${poiId}`, data);
     return response.data;
   },
 
   delete: async (villageSlug, poiId) => {
-    const response = await api.delete(`/api/villages/${villageSlug}/pois/${poiId}`);
+    const response = await api.delete(`/api/pois/${poiId}`);
     return response.data;
   },
 };
@@ -186,12 +188,12 @@ export const qrCodeAPI = {
 
 export const identityAPI = {
   listThemes: async (villageSlug) => {
-    const response = await api.get(`/api/villages/${villageSlug}/identity/themes`);
+    const response = await api.get(`/api/villages/${villageSlug}/identity`);
     return response.data;
   },
 
   generateTheme: async (villageSlug) => {
-    const response = await api.post(`/api/villages/${villageSlug}/identity/generate`);
+    const response = await api.post(`/api/villages/${villageSlug}/generate-identity`);
     return response.data;
   },
 };
@@ -204,7 +206,7 @@ export const analyticsAPI = {
   getDashboardStats: async (villageSlug) => {
     // Aggregate multiple endpoints for dashboard
     const [pois, qrCodes] = await Promise.all([
-      api.get(`/api/villages/${villageSlug}/pois`),
+      api.get(`/api/pois/`, { params: { village_slug: villageSlug } }),
       api.get(`/api/villages/${villageSlug}/qr-codes`),
     ]);
 
@@ -212,7 +214,7 @@ export const analyticsAPI = {
     const totalScans = qrCodes.data.reduce((sum, qr) => sum + (qr.scan_count || 0), 0);
 
     return {
-      totalPOIs: pois.data.length,
+      totalPOIs: pois.data.total || 0,
       totalQRCodes: qrCodes.data.length,
       totalScans,
       recentQRCodes: qrCodes.data.slice(0, 5),
