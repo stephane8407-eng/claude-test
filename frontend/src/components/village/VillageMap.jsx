@@ -29,9 +29,12 @@ export function VillageMap({ villageSlug, pois = [], center, showConflicts = tru
   const loadConflicts = async () => {
     try {
       const response = await axios.get(`/api/villages/${villageSlug}/conflicts`);
-      setConflicts(response.data);
+      // Ensure we always set an array
+      const conflictsData = Array.isArray(response.data) ? response.data : [];
+      setConflicts(conflictsData);
     } catch (error) {
       console.error('Failed to load conflicts:', error);
+      setConflicts([]); // Set empty array on error
     }
   };
 
@@ -68,7 +71,8 @@ export function VillageMap({ villageSlug, pois = [], center, showConflicts = tru
     });
 
     // Add conflict markers
-    if (layersVisible.conflicts && conflicts.length > 0) {
+    const safeConflicts = Array.isArray(conflicts) ? conflicts : [];
+    if (layersVisible.conflicts && safeConflicts.length > 0) {
       const conflictIcon = L.divIcon({
         className: 'conflict-marker',
         html: '<div style="background: #dc2626; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
@@ -76,7 +80,7 @@ export function VillageMap({ villageSlug, pois = [], center, showConflicts = tru
         iconAnchor: [10, 10]
       });
 
-      conflicts.forEach(conflict => {
+      safeConflicts.forEach(conflict => {
         if (conflict.latitude && conflict.longitude) {
           const marker = L.marker([conflict.latitude, conflict.longitude], { icon: conflictIcon })
             .bindPopup(`
@@ -140,7 +144,7 @@ export function VillageMap({ villageSlug, pois = [], center, showConflicts = tru
             />
             <span className="flex items-center text-sm">
               <span className="w-3 h-3 rounded-full bg-red-600 mr-2"></span>
-              Conflicts ({conflicts.length})
+              Conflicts ({Array.isArray(conflicts) ? conflicts.length : 0})
             </span>
           </label>
         )}
