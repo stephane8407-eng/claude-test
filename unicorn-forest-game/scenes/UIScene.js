@@ -194,6 +194,9 @@ class UIScene extends Phaser.Scene {
     }
 
     showMessage(text, duration = 2000) {
+        // Safety check - make sure UI is ready
+        if (!this.messageText) return;
+
         const { width } = this.cameras.main;
 
         // Update message text
