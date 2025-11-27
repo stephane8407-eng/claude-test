@@ -125,9 +125,9 @@ class Mushroom extends Phaser.GameObjects.Container {
 class MushroomManager {
     constructor(scene) {
         this.scene = scene;
-        // Use Phaser Groups for proper physics collision detection
-        this.safeMushroomsGroup = scene.add.group();
-        this.redMushroomsGroup = scene.add.group();
+        // Use Phaser Physics Groups for proper collision detection
+        this.safeMushroomsGroup = scene.physics.add.group();
+        this.redMushroomsGroup = scene.physics.add.group();
     }
 
     spawnMushrooms(safeCount, redCount) {

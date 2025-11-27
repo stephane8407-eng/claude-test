@@ -154,23 +154,27 @@ class GameScene extends Phaser.Scene {
     }
 
     setupCollisions() {
-        // Player collects safe mushrooms
-        this.physics.add.overlap(
-            this.player,
-            this.mushroomManager.getSafeMushroomsGroup(),
-            this.collectSafeMushroom,
-            null,
-            this
-        );
+        // Player collects safe mushrooms - iterate through each mushroom
+        this.mushroomManager.getSafeMushroomsGroup().getChildren().forEach(mushroom => {
+            this.physics.add.overlap(
+                this.player,
+                mushroom,
+                this.collectSafeMushroom,
+                null,
+                this
+            );
+        });
 
         // Player hits red mushrooms
-        this.physics.add.overlap(
-            this.player,
-            this.mushroomManager.getRedMushroomsGroup(),
-            this.hitRedMushroom,
-            null,
-            this
-        );
+        this.mushroomManager.getRedMushroomsGroup().getChildren().forEach(mushroom => {
+            this.physics.add.overlap(
+                this.player,
+                mushroom,
+                this.hitRedMushroom,
+                null,
+                this
+            );
+        });
 
         // Fox catches player
         this.physics.add.overlap(
