@@ -97,7 +97,8 @@ class UIScene extends Phaser.Scene {
 
         // Player frozen
         gameScene.events.on('playerFrozen', (data) => {
-            this.showFreezeEffect(data.duration);
+            const duration = (data && data.duration) || GAME_CONFIG.player.freezeDuration;
+            this.showFreezeEffect(duration);
         });
 
         // Player unfrozen
