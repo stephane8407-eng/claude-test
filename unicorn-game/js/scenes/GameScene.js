@@ -155,7 +155,7 @@ class GameScene extends Phaser.Scene {
 
     setupCollisions() {
         // Player collects safe mushrooms - iterate through each mushroom
-        this.mushroomManager.getSafeMushroomsGroup().getChildren().forEach(mushroom => {
+        this.mushroomManager.getSafeMushrooms().forEach(mushroom => {
             this.physics.add.overlap(
                 this.player,
                 mushroom,
@@ -166,7 +166,7 @@ class GameScene extends Phaser.Scene {
         });
 
         // Player hits red mushrooms
-        this.mushroomManager.getRedMushroomsGroup().getChildren().forEach(mushroom => {
+        this.mushroomManager.getRedMushrooms().forEach(mushroom => {
             this.physics.add.overlap(
                 this.player,
                 mushroom,
