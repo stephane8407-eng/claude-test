@@ -101,6 +101,10 @@ class MenuScene extends Phaser.Scene {
         });
 
         playButton.on('pointerdown', () => {
+            // Play button click sound
+            soundManager.init();
+            soundManager.buttonClick();
+
             // Reset game data
             this.game.globalData.lives = 3;
             this.game.globalData.currentLevel = 1;
@@ -108,6 +112,35 @@ class MenuScene extends Phaser.Scene {
             // Start game
             this.scene.start('GameScene');
             this.scene.launch('UIScene');
+        });
+
+        // Sound toggle button
+        const soundButton = this.add.rectangle(width - 60, 30, 100, 40, 0x228b22)
+            .setStrokeStyle(3, 0x006400)
+            .setInteractive({ useHandCursor: true });
+
+        this.soundText = this.add.text(width - 60, 30, '🔊 Sound ON', {
+            fontSize: '14px',
+            fill: '#ffffff',
+            fontFamily: 'Comic Sans MS, cursive'
+        }).setOrigin(0.5);
+
+        soundButton.on('pointerover', () => {
+            soundButton.setFillStyle(0x006400);
+        });
+
+        soundButton.on('pointerout', () => {
+            soundButton.setFillStyle(0x228b22);
+        });
+
+        soundButton.on('pointerdown', () => {
+            // Initialize sound manager if not already
+            soundManager.init();
+            const enabled = soundManager.toggle();
+            this.soundText.setText(enabled ? '🔊 Sound ON' : '🔇 Sound OFF');
+            if (enabled) {
+                soundManager.buttonClick();
+            }
         });
 
         // Credits

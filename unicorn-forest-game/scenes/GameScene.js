@@ -43,6 +43,10 @@ class GameScene extends Phaser.Scene {
     create() {
         const { width, height } = this.cameras.main;
 
+        // Initialize sound manager
+        soundManager.init();
+        soundManager.resume();
+
         // Create the forest background
         this.createBackground();
 
@@ -372,6 +376,11 @@ class GameScene extends Phaser.Scene {
         this.timeRemaining--;
         this.updateUI();
 
+        // Play warning sound when time is low
+        if (this.timeRemaining <= 10 && this.timeRemaining > 0) {
+            soundManager.timerWarning();
+        }
+
         if (this.timeRemaining <= 0) {
             this.timeUp();
         }
@@ -465,6 +474,9 @@ class GameScene extends Phaser.Scene {
         // Remove mushroom
         mushroom.destroy();
 
+        // Play sound
+        soundManager.collectMushroom();
+
         // Increment count
         this.collectedMushrooms++;
 
@@ -486,6 +498,9 @@ class GameScene extends Phaser.Scene {
         // Remove mushroom
         mushroom.destroy();
 
+        // Play poison sound
+        soundManager.poison();
+
         // Freeze Uni
         this.isFrozen = true;
         this.uni.setTint(0x9932cc); // Purple tint to show poisoned
@@ -504,6 +519,9 @@ class GameScene extends Phaser.Scene {
     collectMagicBook(uni, book) {
         // Remove book
         book.destroy();
+
+        // Play magic book sound
+        soundManager.collectBook();
 
         // Add magic charge
         this.magicCharges++;
@@ -538,6 +556,10 @@ class GameScene extends Phaser.Scene {
     }
 
     transformToChicken() {
+        // Play magic and chicken sounds
+        soundManager.useMagic();
+        setTimeout(() => soundManager.foxToChicken(), 300);
+
         this.foxIsChicken = true;
         this.fox.setTexture('chicken');
         this.foxLabel.setText('Mr Chicken');
@@ -566,6 +588,9 @@ class GameScene extends Phaser.Scene {
     }
 
     transformToFox() {
+        // Play fox return sound
+        soundManager.chickenToFox();
+
         this.foxIsChicken = false;
         this.fox.setTexture('fox');
         this.foxLabel.setText('Mr Fox');
@@ -602,6 +627,9 @@ class GameScene extends Phaser.Scene {
     }
 
     loseHorn() {
+        // Play lose horn sound
+        soundManager.loseHorn();
+
         this.hasHorn = false;
         this.uni.setTexture('uni_no_horn');
 
@@ -627,6 +655,9 @@ class GameScene extends Phaser.Scene {
     }
 
     loseLife() {
+        // Play lose life sound
+        soundManager.loseLife();
+
         this.game.globalData.lives--;
 
         // Knock back and flash
@@ -692,6 +723,9 @@ class GameScene extends Phaser.Scene {
     }
 
     showOwlMagicSequence() {
+        // Play owl hoot
+        soundManager.owlHoot();
+
         const messages = [
             { text: 'Mr Owl finds the right book...', delay: 0 },
             { text: '📖 "Hornus Restorus!"', delay: 1500 },
@@ -713,6 +747,9 @@ class GameScene extends Phaser.Scene {
 
         // Restore horn after sequence
         this.time.delayedCall(5500, () => {
+            // Play horn restored sound
+            soundManager.hornRestored();
+
             this.hasHorn = true;
             this.uni.setTexture('uni_horn');
             this.isFrozen = false;
@@ -797,6 +834,9 @@ class GameScene extends Phaser.Scene {
         this.isPaused = true;
         this.timerEvent.remove();
 
+        // Play time up sound
+        soundManager.timeUp();
+
         this.showMessage('⏰ Time\'s up!', 2000);
 
         this.time.delayedCall(2000, () => {
@@ -819,6 +859,9 @@ class GameScene extends Phaser.Scene {
         this.isPaused = true;
         if (this.timerEvent) this.timerEvent.remove();
 
+        // Play level complete sound
+        soundManager.levelComplete();
+
         // Show completion in UI
         const uiScene = this.scene.get('UIScene');
         if (uiScene && uiScene.showLevelComplete) {
@@ -838,6 +881,9 @@ class GameScene extends Phaser.Scene {
         this.isPaused = true;
         if (this.timerEvent) this.timerEvent.remove();
 
+        // Play game over sound
+        soundManager.gameOver();
+
         // Show game over in UI
         const uiScene = this.scene.get('UIScene');
         if (uiScene && uiScene.showGameOver) {
@@ -852,6 +898,9 @@ class GameScene extends Phaser.Scene {
     youWin() {
         this.isPaused = true;
         if (this.timerEvent) this.timerEvent.remove();
+
+        // Play victory sound
+        soundManager.victory();
 
         // Show victory in UI
         const uiScene = this.scene.get('UIScene');
