@@ -202,19 +202,23 @@ class UIScene extends Phaser.Scene {
     }
 
     updateHornIndicator(hasHorn) {
+        if (!this.hornIndicator) return;
+
         this.hornIndicator.clear();
 
         if (hasHorn) {
             // Draw golden horn icon
             this.hornIndicator.fillStyle(0xffd700);
             this.hornIndicator.fillTriangle(710, 35, 700, 15, 720, 15);
-            this.hornText.setText('');
+            if (this.hornText) this.hornText.setText('');
         } else {
             // Draw broken horn icon
             this.hornIndicator.fillStyle(0x808080);
             this.hornIndicator.fillTriangle(710, 35, 705, 25, 715, 25);
-            this.hornText.setText('Lost!');
-            this.hornText.setFill('#ff6b6b');
+            if (this.hornText) {
+                this.hornText.setText('Lost!');
+                this.hornText.setFill('#ff6b6b');
+            }
         }
     }
 
