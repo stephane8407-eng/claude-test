@@ -120,13 +120,14 @@ class Mushroom extends Phaser.GameObjects.Container {
 
 /**
  * Mushroom Manager
- * Handles spawning and tracking mushrooms
+ * Handles spawning and tracking mushrooms using Phaser Groups
  */
 class MushroomManager {
     constructor(scene) {
         this.scene = scene;
-        this.safeMushrooms = [];
-        this.redMushrooms = [];
+        // Use Phaser Groups for proper physics collision detection
+        this.safeMushroomsGroup = scene.add.group();
+        this.redMushroomsGroup = scene.add.group();
     }
 
     spawnMushrooms(safeCount, redCount) {
@@ -134,27 +135,27 @@ class MushroomManager {
         for (let i = 0; i < safeCount; i++) {
             const pos = Mushroom.getRandomPosition(this.scene);
             const mushroom = new Mushroom(this.scene, pos.x, pos.y, true);
-            this.safeMushrooms.push(mushroom);
+            this.safeMushroomsGroup.add(mushroom);
         }
 
         // Spawn red mushrooms
         for (let i = 0; i < redCount; i++) {
             const pos = Mushroom.getRandomPosition(this.scene);
             const mushroom = new Mushroom(this.scene, pos.x, pos.y, false);
-            this.redMushrooms.push(mushroom);
+            this.redMushroomsGroup.add(mushroom);
         }
     }
 
-    getSafeMushrooms() {
-        return this.safeMushrooms.filter(m => !m.isCollected);
+    getSafeMushroomsGroup() {
+        return this.safeMushroomsGroup;
     }
 
-    getRedMushrooms() {
-        return this.redMushrooms.filter(m => !m.isCollected);
+    getRedMushroomsGroup() {
+        return this.redMushroomsGroup;
     }
 
     getAllMushrooms() {
-        return [...this.safeMushrooms, ...this.redMushrooms];
+        return [...this.safeMushroomsGroup.getChildren(), ...this.redMushroomsGroup.getChildren()];
     }
 
     // Respawn a collected mushroom after delay
@@ -168,9 +169,7 @@ class MushroomManager {
     }
 
     destroy() {
-        this.safeMushrooms.forEach(m => m.destroy());
-        this.redMushrooms.forEach(m => m.destroy());
-        this.safeMushrooms = [];
-        this.redMushrooms = [];
+        this.safeMushroomsGroup.destroy(true);
+        this.redMushroomsGroup.destroy(true);
     }
 }

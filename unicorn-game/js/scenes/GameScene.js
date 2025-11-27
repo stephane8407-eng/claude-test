@@ -157,7 +157,7 @@ class GameScene extends Phaser.Scene {
         // Player collects safe mushrooms
         this.physics.add.overlap(
             this.player,
-            this.mushroomManager.safeMushrooms,
+            this.mushroomManager.getSafeMushroomsGroup(),
             this.collectSafeMushroom,
             null,
             this
@@ -166,7 +166,7 @@ class GameScene extends Phaser.Scene {
         // Player hits red mushrooms
         this.physics.add.overlap(
             this.player,
-            this.mushroomManager.redMushrooms,
+            this.mushroomManager.getRedMushroomsGroup(),
             this.hitRedMushroom,
             null,
             this
