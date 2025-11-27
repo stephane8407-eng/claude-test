@@ -49,12 +49,12 @@ class UIScene extends Phaser.Scene {
 
         // Horn status indicator
         this.hornIndicator = this.add.graphics();
-        this.updateHornIndicator(GameState.hasHorn);
         this.hornText = this.add.text(720, 15, '', {
             fontFamily: 'Comic Sans MS, cursive',
             fontSize: '14px',
             fill: '#ffd700'
         });
+        this.updateHornIndicator(GameState.hasHorn);
 
         // Freeze overlay (hidden by default)
         this.freezeOverlay = this.add.graphics();
