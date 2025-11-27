@@ -264,9 +264,10 @@ class PreloadScene extends Phaser.Scene {
         graphics.fillStyle(0x6a0dad, 1);
         graphics.fillRect(0, 0, 4, 24);
 
-        // Magic star
+        // Magic star (diamond shape)
         graphics.fillStyle(0xffd700, 1);
-        graphics.fillStar(17, 12, 5, 6, 3);
+        graphics.fillTriangle(17, 6, 13, 12, 21, 12);
+        graphics.fillTriangle(17, 18, 13, 12, 21, 12);
 
         // Sparkles
         graphics.fillStyle(0xffffff, 1);
