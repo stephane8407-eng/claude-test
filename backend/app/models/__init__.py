@@ -22,6 +22,12 @@ from app.models.qr_code import QRCode
 from app.models.qr_scan import QRScan
 from app.models.qr_route import QRRoute
 
+# V1 Product Spec - New models
+from app.models.topic import Topic
+from app.models.sponsor import Sponsor
+from app.models.sponsor_slot import SponsorSlot
+from app.models.project import Project
+
 __all__ = [
     "Battle",
     "Place",
@@ -43,4 +49,9 @@ __all__ = [
     "QRCode",
     "QRScan",
     "QRRoute",
+    # V1 Product Spec - New models
+    "Topic",
+    "Sponsor",
+    "SponsorSlot",
+    "Project",
 ]

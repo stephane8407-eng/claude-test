@@ -18,7 +18,7 @@ from app.models.qr_route import QRRoute
 from app.models.village import Village
 from app.models.poi import POI
 from app.services.qr_generator import get_qr_generator, QRCodeSize
-from app.services.auth import get_current_user
+from app.middleware.auth import get_current_user
 from app.models.user import User
 from app.services.logger import get_logger
 from pydantic import BaseModel, Field

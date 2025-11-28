@@ -18,6 +18,7 @@ class LocalConflict(Base):
 
     # Basic Information
     name = Column(String(500), nullable=False)
+    slug = Column(String(100), unique=True, index=True)  # V1 Spec
     date = Column(Date, index=True)
     date_str = Column(String(50))  # Original date string
     date_precision = Column(String(20))  # "day", "month", "year", "circa"
@@ -27,8 +28,11 @@ class LocalConflict(Base):
 
     # Conflict Classification
     conflict_type = Column(String(50), index=True)  # battle, siege, skirmish, etc.
+    event_type = Column(String(50), index=True)  # V1 Spec: battle, siege, festival, flood, etc.
     period = Column(String(50), index=True)  # ancient, medieval, ww1, ww2, etc.
+    scale = Column(String(20), index=True)  # V1 Spec: local, regional, national
     duration = Column(String(100))
+    themes = Column(ARRAY(Text))  # V1 Spec: Array of theme tags
 
     # Participants & Outcome
     participants = Column(JSONB)  # [{name, side, role}, ...]
@@ -70,6 +74,7 @@ class LocalConflict(Base):
             "id": self.id,
             "village_id": self.village_id,
             "name": self.name,
+            "slug": self.slug,  # V1 Spec
             "date": self.date.isoformat() if self.date else None,
             "date_str": self.date_str,
             "date_precision": self.date_precision,
@@ -77,8 +82,11 @@ class LocalConflict(Base):
             "latitude": float(self.latitude) if self.latitude else None,
             "longitude": float(self.longitude) if self.longitude else None,
             "conflict_type": self.conflict_type,
+            "event_type": self.event_type,  # V1 Spec
             "period": self.period,
+            "scale": self.scale,  # V1 Spec
             "duration": self.duration,
+            "themes": self.themes or [],  # V1 Spec
             "participants": self.participants,
             "casualties": self.casualties,
             "outcome": self.outcome,

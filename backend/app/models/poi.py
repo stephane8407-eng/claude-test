@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, TIMESTAMP, ForeignKey, func
+from sqlalchemy import Column, Integer, String, Text, DECIMAL, Boolean, TIMESTAMP, ForeignKey, func, ARRAY
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
@@ -18,6 +18,7 @@ class POI(Base):
 
     # Basic info
     name = Column(String(255), nullable=False)
+    slug = Column(String(100), unique=True, index=True)  # V1 Spec
     description = Column(Text)
 
     # Location
@@ -25,12 +26,17 @@ class POI(Base):
     longitude = Column(DECIMAL(10, 7), nullable=False)
     address = Column(Text)
 
+    # V1 Spec: New fields
+    hero_image_url = Column(String(500))  # Hero image for place detail page
+    access = Column(String(50), default='public')  # 'public', 'private', 'ruin', 'restricted'
+    themes = Column(ARRAY(Text))  # Array of theme tags
+
     # Additional attributes (flexible JSON)
     attributes = Column(JSONB, default={})
 
     # Visibility & status
     is_public = Column(Boolean, default=True, index=True)
-    status = Column(String(20), default='active', index=True)
+    status = Column(String(20), default='active', index=True)  # 'active', 'draft', 'published'
 
     # Metadata
     created_at = Column(TIMESTAMP, server_default=func.now())
@@ -55,10 +61,16 @@ class POI(Base):
             'village_id': self.village_id,
             'poi_type_id': self.poi_type_id,
             'name': self.name,
+            'slug': self.slug,
             'description': self.description,
             'latitude': float(self.latitude) if self.latitude else None,
             'longitude': float(self.longitude) if self.longitude else None,
             'address': self.address,
+            # V1 Spec: New fields
+            'hero_image_url': self.hero_image_url,
+            'access': self.access,
+            'themes': self.themes or [],
+            # Legacy fields
             'attributes': self.attributes or {},
             'is_public': self.is_public,
             'status': self.status,

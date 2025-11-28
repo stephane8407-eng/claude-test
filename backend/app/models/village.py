@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DECIMAL, Date, TIMESTAMP, func
+from sqlalchemy import Column, Integer, String, Text, DECIMAL, Date, TIMESTAMP, func, ARRAY
 from sqlalchemy.dialects.postgresql import JSONB
 from geoalchemy2 import Geometry
 from sqlalchemy.orm import relationship
@@ -26,6 +26,13 @@ class Village(Base):
     # Village details
     population = Column(Integer)
     area_km2 = Column(DECIMAL(10, 2))
+
+    # V1 Spec: Identity fields
+    summary_identity = Column(Text)  # Short tagline for public display
+    long_identity = Column(Text)  # 1-3 paragraph narrative
+    live_here_summary = Column(Text)  # "Living here" section content
+    hero_image_url = Column(String(500))  # Hero image for public page
+    themes = Column(ARRAY(Text))  # Array of theme tags
 
     # Subscription
     subscription_tier = Column(String(20), default='free', index=True)
@@ -65,6 +72,13 @@ class Village(Base):
             'region': self.region,
             'population': self.population,
             'area_km2': float(self.area_km2) if self.area_km2 else None,
+            # V1 Spec: Identity fields
+            'summary_identity': self.summary_identity,
+            'long_identity': self.long_identity,
+            'live_here_summary': self.live_here_summary,
+            'hero_image_url': self.hero_image_url,
+            'themes': self.themes or [],
+            # Subscription
             'subscription_tier': self.subscription_tier,
             'subscription_status': self.subscription_status,
             'settings': self.settings or {},
