@@ -1,9 +1,13 @@
 @import "tailwindcss";
 
+/* SPV Design System */
+@import "./styles/design-system.css";
+
+/* Note: CSS custom properties from design-system.css are available globally.
+   Use them in Tailwind with arbitrary values: bg-[var(--color-primary)] */
+
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-family);
 }
 
 * {
@@ -14,9 +18,11 @@
 
 body {
   margin: 0;
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
 #root {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
 }

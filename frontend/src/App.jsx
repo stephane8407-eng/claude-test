@@ -8,6 +8,7 @@ import { DashboardLayout } from './components/dashboard/DashboardLayout';
 import { DashboardHome } from './pages/DashboardHome';
 import { POIManager } from './pages/POIManager';
 import { QRCodeManager } from './pages/QRCodeManager';
+import { DesignSystemPage } from './pages/DesignSystemPage';
 
 function App() {
   return (
@@ -20,6 +21,9 @@ function App() {
 
           {/* Public Village Routes */}
           <Route path="/villages/:slug" element={<VillagePage />} />
+
+          {/* Design System Preview */}
+          <Route path="/design-system" element={<DesignSystemPage />} />
 
           {/* Protected Dashboard Routes */}
           <Route

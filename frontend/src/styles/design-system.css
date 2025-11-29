@@ -1,0 +1,232 @@
+/**
+ * SPV Treasure Map - Design System
+ * V1 Product Spec Implementation
+ *
+ * A warm, clean design system with heritage/outdoors vibes.
+ */
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES (Design Tokens)
+   ============================================================================ */
+
+:root {
+  /* ==========================================================================
+     COLORS
+     ========================================================================== */
+
+  /* Primary palette */
+  --color-primary: #008080;           /* Teal - main brand color */
+  --color-primary-hover: #006666;     /* Darker teal for hover states */
+  --color-primary-light: #e6f3f3;     /* Light teal for backgrounds */
+
+  /* Secondary palette */
+  --color-secondary: #C8A2C8;         /* Lilac - accent color */
+  --color-secondary-hover: #b88fb8;   /* Darker lilac for hover */
+  --color-secondary-light: #f5eef5;   /* Light lilac for backgrounds */
+
+  /* Neutral palette */
+  --color-background: #F5F5F5;        /* Page background - light grey */
+  --color-surface: #FFFFFF;           /* Card/panel background - white */
+  --color-border: #E5E7EB;            /* Default border color */
+  --color-border-hover: #D1D5DB;      /* Border on hover */
+
+  /* Text colors */
+  --color-text: #1F2937;              /* Primary text - dark grey */
+  --color-text-muted: #6B7280;        /* Secondary text - medium grey */
+  --color-text-light: #9CA3AF;        /* Tertiary text - light grey */
+  --color-text-inverse: #FFFFFF;      /* Text on dark backgrounds */
+
+  /* Semantic colors */
+  --color-success: #10B981;           /* Green for success states */
+  --color-warning: #F59E0B;           /* Amber for warnings */
+  --color-error: #EF4444;             /* Red for errors */
+  --color-info: #3B82F6;              /* Blue for info */
+
+  /* Difficulty colors (for routes) */
+  --color-difficulty-easy: #10B981;   /* Green */
+  --color-difficulty-medium: #F59E0B; /* Amber */
+  --color-difficulty-hard: #EF4444;   /* Red */
+
+  /* ==========================================================================
+     TYPOGRAPHY
+     ========================================================================== */
+
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+
+  /* Font sizes */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 2rem;      /* 32px */
+  --font-size-4xl: 2.5rem;    /* 40px */
+
+  /* Line heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Font weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ==========================================================================
+     SPACING (4px grid)
+     ========================================================================== */
+
+  --spacing-1: 0.25rem;   /* 4px */
+  --spacing-2: 0.5rem;    /* 8px */
+  --spacing-3: 0.75rem;   /* 12px */
+  --spacing-4: 1rem;      /* 16px */
+  --spacing-6: 1.5rem;    /* 24px */
+  --spacing-8: 2rem;      /* 32px */
+  --spacing-12: 3rem;     /* 48px */
+  --spacing-16: 4rem;     /* 64px */
+
+  /* ==========================================================================
+     BORDERS & SHADOWS
+     ========================================================================== */
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;       /* Buttons */
+  --radius-lg: 12px;      /* Cards */
+  --radius-xl: 16px;
+  --radius-full: 9999px;  /* Pills/chips */
+
+  /* Box shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Card shadow (per spec) */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  /* ==========================================================================
+     TRANSITIONS
+     ========================================================================== */
+
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* ==========================================================================
+     Z-INDEX SCALE
+     ========================================================================== */
+
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal-backdrop: 300;
+  --z-modal: 400;
+  --z-tooltip: 500;
+}
+
+
+/* ============================================================================
+   BASE STYLES
+   ============================================================================ */
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+/* Text colors */
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+.text-muted { color: var(--color-text-muted); }
+.text-light { color: var(--color-text-light); }
+
+/* Background colors */
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary-light { background-color: var(--color-primary-light); }
+.bg-secondary { background-color: var(--color-secondary); }
+.bg-secondary-light { background-color: var(--color-secondary-light); }
+.bg-surface { background-color: var(--color-surface); }
+
+/* Typography helpers */
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+
+/* ============================================================================
+   COMPONENT BASE STYLES
+   ============================================================================ */
+
+/* Card base */
+.spv-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-4);
+  transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
+}
+
+.spv-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-border-hover);
+}
+
+/* Button base */
+.spv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  border: none;
+  outline: none;
+}
+
+.spv-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.spv-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Chip/Tag base */
+.spv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
