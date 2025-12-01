@@ -343,3 +343,81 @@ def reset_password(
         "message": "Password reset successful",
         "user_id": user.id
     }
+
+
+# =====================================
+# DEV ONLY: CREATE TEST ADMIN
+# =====================================
+
+class CreateTestAdminRequest(BaseModel):
+    """Request body for creating test admin (dev only)"""
+    email: EmailStr
+    password: str
+    village_slug: str
+
+
+@router.post("/api/auth/create-test-admin", tags=["Authentication"])
+def create_test_admin(
+    request: CreateTestAdminRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Create a test admin user for development.
+
+    WARNING: This endpoint should only be enabled in development.
+    It bypasses password strength requirements.
+    """
+    import os
+
+    # Check if we're in development mode
+    env = os.getenv("ENVIRONMENT", "development")
+    if env not in ["development", "dev", "local"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This endpoint is only available in development mode"
+        )
+
+    # Check if user already exists
+    existing_user = db.query(User).filter(User.email == request.email).first()
+    if existing_user:
+        # Update existing user's password
+        existing_user.password_hash = auth_service.hash_password(request.password)
+        db.commit()
+        return {
+            "message": "Test admin password updated",
+            "user_id": existing_user.id,
+            "email": existing_user.email
+        }
+
+    # Find village
+    village = db.query(Village).filter(Village.slug == request.village_slug).first()
+    if not village:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Village not found: {request.village_slug}"
+        )
+
+    # Hash password (bypassing strength check for testing)
+    password_hash = auth_service.hash_password(request.password)
+
+    # Create user
+    new_user = User(
+        email=request.email,
+        password_hash=password_hash,
+        first_name="Test",
+        last_name="Admin",
+        role="village_admin",
+        village_id=village.id,
+        is_active=True
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {
+        "message": "Test admin created successfully",
+        "user_id": new_user.id,
+        "email": new_user.email,
+        "village": village.name
+    }
