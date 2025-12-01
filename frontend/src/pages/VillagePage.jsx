@@ -7,9 +7,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../components/layout/index';
-import { villageAPI, poiAPI, identityAPI } from '../services/api';
+import { villageAPI, poiAPI } from '../services/api';
 import { VillageMap } from '../components/village/VillageMap';
-import { PublicThemeCard } from '../components/village/PublicThemeCard';
 import { PublicPlaceCard } from '../components/village/PublicPlaceCard';
 import { RouteCard, ThemeChip } from '../components/ui';
 import './VillagePage.css';
@@ -18,7 +17,6 @@ export function VillagePage() {
   const { slug } = useParams();
   const [village, setVillage] = useState(null);
   const [pois, setPois] = useState([]);
-  const [themes, setThemes] = useState([]);
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,15 +28,13 @@ export function VillagePage() {
   const loadVillageData = async () => {
     try {
       setLoading(true);
-      const [villageData, poisData, themesData] = await Promise.all([
+      const [villageData, poisData] = await Promise.all([
         villageAPI.getBySlug(slug),
-        poiAPI.list(slug).catch(() => []),
-        identityAPI.listThemes(slug).catch(() => [])
+        poiAPI.list(slug).catch(() => [])
       ]);
 
       setVillage(villageData);
       setPois(Array.isArray(poisData) ? poisData : []);
-      setThemes(Array.isArray(themesData) ? themesData : []);
       // TODO: Load routes when API is ready
       setRoutes([]);
     } catch (err) {
@@ -143,21 +139,19 @@ export function VillagePage() {
           </div>
         </section>
 
-        {/* Identity Themes - Public friendly display */}
-        {themes.length > 0 && (
-          <section className="spv-village__section spv-village__section--alt">
-            <h2 className="spv-village__section-title">Thèmes & Identité</h2>
-            <div className="spv-village__themes-grid">
-              {themes.slice(0, 3).map((theme, index) => (
-                <PublicThemeCard
-                  key={theme.id || index}
-                  theme={theme}
-                  villageSlug={slug}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+        {/* Simple Identity Section - replaces theme cards temporarily */}
+        <section className="spv-village__section spv-village__section--alt">
+          <h2 className="spv-village__section-title">Identité du village</h2>
+          <div className="spv-village__identity">
+            {village.summary_identity ? (
+              <p>{village.summary_identity}</p>
+            ) : (
+              <p className="spv-village__identity--placeholder">
+                Profil identitaire bientôt disponible
+              </p>
+            )}
+          </div>
+        </section>
 
         {/* Places Section */}
         {pois.length > 0 && (

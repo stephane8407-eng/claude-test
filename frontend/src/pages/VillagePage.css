@@ -181,6 +181,29 @@
 }
 
 /* ==========================================================================
+   IDENTITY SECTION
+   ========================================================================== */
+
+.spv-village__identity {
+  max-width: 800px;
+  padding: var(--spacing-4);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.spv-village__identity p {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  line-height: var(--line-height-relaxed);
+}
+
+.spv-village__identity--placeholder {
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
    MAP
    ========================================================================== */
 
