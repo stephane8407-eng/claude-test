@@ -48,12 +48,10 @@ api.interceptors.response.use(
 
 export const authAPI = {
   login: async (email, password) => {
-    const formData = new FormData();
-    formData.append('username', email);
-    formData.append('password', password);
-
-    const response = await api.post('/api/auth/login', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    // Backend expects JSON with email and password fields
+    const response = await api.post('/api/auth/login', {
+      email,
+      password,
     });
 
     if (response.data.access_token) {

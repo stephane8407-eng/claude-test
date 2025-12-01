@@ -19,7 +19,24 @@ export function LoginPage() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed');
+      // Handle different error formats from FastAPI
+      const errorData = err.response?.data;
+      let errorMessage = 'Connexion échouée';
+
+      if (errorData) {
+        if (typeof errorData.detail === 'string') {
+          // Standard error message
+          errorMessage = errorData.detail;
+        } else if (Array.isArray(errorData.detail)) {
+          // 422 validation error - extract first message
+          errorMessage = errorData.detail[0]?.msg || 'Erreur de validation';
+        } else if (typeof errorData.detail === 'object') {
+          // Object error - extract msg field
+          errorMessage = errorData.detail.msg || 'Erreur de connexion';
+        }
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -60,9 +77,12 @@ export function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="w-full text-white py-2 px-4 rounded-md disabled:opacity-50"
+            style={{ backgroundColor: loading ? '#006666' : 'var(--color-primary, #008080)' }}
+            onMouseOver={(e) => !loading && (e.target.style.backgroundColor = '#006666')}
+            onMouseOut={(e) => !loading && (e.target.style.backgroundColor = 'var(--color-primary, #008080)')}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
       </div>
