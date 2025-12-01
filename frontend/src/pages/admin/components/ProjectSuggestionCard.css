@@ -1,0 +1,137 @@
+/**
+ * ProjectSuggestionCard Styles
+ * Project card with Phase D placeholders
+ */
+
+.spv-project-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   MAIN CONTENT
+   ========================================================================== */
+
+.spv-project-card__main {
+  padding: var(--spacing-4);
+}
+
+.spv-project-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-2);
+}
+
+.spv-project-card__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+
+.spv-project-card__remove {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 20px;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.spv-project-card__remove:hover {
+  color: #dc2626;
+  border-color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.spv-project-card__description {
+  margin: 0 0 var(--spacing-3) 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ==========================================================================
+   THEMES
+   ========================================================================== */
+
+.spv-project-card__themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-3);
+}
+
+.spv-project-card__theme {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  border-radius: var(--radius-sm);
+}
+
+/* ==========================================================================
+   META INFO
+   ========================================================================== */
+
+.spv-project-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+}
+
+.spv-project-card__meta-item {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   PHASE D PLACEHOLDERS
+   ========================================================================== */
+
+.spv-project-card__phase-d {
+  padding: var(--spacing-4);
+  background-color: var(--color-background);
+  border-top: 1px solid var(--color-border);
+}
+
+.spv-project-card__placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-3);
+}
+
+.spv-project-card__placeholder:last-child {
+  margin-bottom: 0;
+}
+
+.spv-project-card__placeholder-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.spv-project-card__placeholder-value {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.spv-project-card__placeholder-value em {
+  color: var(--color-text-light);
+}

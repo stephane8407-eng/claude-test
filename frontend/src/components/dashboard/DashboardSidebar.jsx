@@ -10,10 +10,10 @@ import {
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+  { name: 'Audit Identité', href: '/dashboard/identity-audit', icon: LightBulbIcon },
   { name: 'POIs', href: '/dashboard/pois', icon: MapPinIcon },
   { name: 'QR Codes', href: '/dashboard/qr-codes', icon: QrCodeIcon },
   { name: 'Analytics', href: '/dashboard/analytics', icon: ChartBarIcon },
-  { name: 'Identity', href: '/dashboard/identity', icon: LightBulbIcon },
   { name: 'Settings', href: '/dashboard/settings', icon: CogIcon },
 ];
 

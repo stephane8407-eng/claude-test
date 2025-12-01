@@ -10,6 +10,7 @@ import { DashboardHome } from './pages/DashboardHome';
 import { POIManager } from './pages/POIManager';
 import { QRCodeManager } from './pages/QRCodeManager';
 import { DesignSystemPage } from './pages/DesignSystemPage';
+import { IdentityAuditWizard } from './pages/admin/IdentityAuditWizard';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             }
           >
             <Route index element={<DashboardHome />} />
+            <Route path="identity-audit" element={<IdentityAuditWizard />} />
             <Route path="pois" element={<POIManager />} />
             <Route path="qr-codes" element={<QRCodeManager />} />
           </Route>

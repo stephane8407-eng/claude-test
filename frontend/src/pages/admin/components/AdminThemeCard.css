@@ -1,0 +1,148 @@
+/**
+ * AdminThemeCard Styles
+ * Admin-only theme card with confidence display
+ */
+
+.spv-admin-theme {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-4);
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition-fast);
+}
+
+.spv-admin-theme--accepted {
+  border-color: var(--color-primary);
+}
+
+.spv-admin-theme--rejected {
+  opacity: 0.6;
+  border-color: var(--color-border);
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.spv-admin-theme__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-2);
+}
+
+.spv-admin-theme__number {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+.spv-admin-theme__confidence {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-full);
+}
+
+.spv-admin-theme__confidence--high {
+  color: #166534;
+  background-color: #dcfce7;
+}
+
+.spv-admin-theme__confidence--medium {
+  color: #854d0e;
+  background-color: #fef9c3;
+}
+
+.spv-admin-theme__confidence--low {
+  color: #9a3412;
+  background-color: #ffedd5;
+}
+
+/* ==========================================================================
+   CONTENT
+   ========================================================================== */
+
+.spv-admin-theme__title {
+  margin: 0 0 var(--spacing-3) 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+
+.spv-admin-theme__bullets {
+  margin: 0 0 var(--spacing-4) 0;
+  padding-left: var(--spacing-5);
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+}
+
+.spv-admin-theme__bullets li {
+  margin-bottom: var(--spacing-1);
+}
+
+/* ==========================================================================
+   TOURISM IDEAS
+   ========================================================================== */
+
+.spv-admin-theme__ideas {
+  margin-bottom: var(--spacing-4);
+  padding: var(--spacing-3);
+  background-color: var(--color-background);
+  border-radius: var(--radius-md);
+}
+
+.spv-admin-theme__ideas-title {
+  margin: 0 0 var(--spacing-2) 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.spv-admin-theme__ideas-list {
+  margin: 0;
+  padding-left: var(--spacing-5);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.spv-admin-theme__ideas-list li {
+  margin-bottom: var(--spacing-1);
+}
+
+/* ==========================================================================
+   TOGGLE
+   ========================================================================== */
+
+.spv-admin-theme__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-top: auto;
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.spv-admin-theme__checkbox {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.spv-admin-theme__toggle-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.spv-admin-theme--rejected .spv-admin-theme__toggle-label {
+  color: var(--color-text-muted);
+}

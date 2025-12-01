@@ -1,0 +1,479 @@
+/**
+ * Identity Audit Wizard Styles
+ * Clean admin UI with teal accents, 16px fonts
+ */
+
+.spv-wizard {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-6);
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.spv-wizard__header {
+  margin-bottom: var(--spacing-8);
+  text-align: center;
+}
+
+.spv-wizard__title {
+  margin: 0 0 var(--spacing-2) 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.spv-wizard__subtitle {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   STEPPER
+   ========================================================================== */
+
+.spv-wizard__stepper {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-8);
+  flex-wrap: wrap;
+}
+
+.spv-wizard__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity var(--transition-fast);
+}
+
+.spv-wizard__step:hover {
+  opacity: 0.8;
+}
+
+.spv-wizard__step--active {
+  opacity: 1;
+}
+
+.spv-wizard__step--completed {
+  opacity: 0.8;
+}
+
+.spv-wizard__step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  background-color: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.spv-wizard__step--active .spv-wizard__step-number {
+  color: white;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.spv-wizard__step--completed .spv-wizard__step-number {
+  color: white;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.spv-wizard__step-title {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.spv-wizard__step--active .spv-wizard__step-title {
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ==========================================================================
+   STEP HEADER
+   ========================================================================== */
+
+.spv-wizard__step-header {
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.spv-wizard__step-heading {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+/* ==========================================================================
+   CONTENT
+   ========================================================================== */
+
+.spv-wizard__content {
+  margin-bottom: var(--spacing-8);
+}
+
+/* ==========================================================================
+   NAVIGATION
+   ========================================================================== */
+
+.spv-wizard__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.spv-wizard__btn {
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.spv-wizard__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spv-wizard__btn--primary {
+  color: white;
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.spv-wizard__btn--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.spv-wizard__btn--secondary {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.spv-wizard__btn--secondary:hover:not(:disabled) {
+  background-color: var(--color-background);
+}
+
+/* ==========================================================================
+   FORM ELEMENTS
+   ========================================================================== */
+
+.spv-form-group {
+  margin-bottom: var(--spacing-6);
+}
+
+.spv-form-label {
+  display: block;
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.spv-form-label--required::after {
+  content: ' *';
+  color: var(--color-error, #dc2626);
+}
+
+.spv-form-hint {
+  margin-top: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.spv-form-input {
+  width: 100%;
+  padding: var(--spacing-3);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
+}
+
+.spv-form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.spv-form-input::placeholder {
+  color: var(--color-placeholder);
+}
+
+.spv-form-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: var(--spacing-3);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+
+.spv-form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.spv-form-textarea::placeholder {
+  color: var(--color-placeholder);
+}
+
+.spv-form-textarea--large {
+  min-height: 200px;
+}
+
+.spv-form-select {
+  width: 100%;
+  padding: var(--spacing-3);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.spv-form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* ==========================================================================
+   CHECKBOX GROUP
+   ========================================================================== */
+
+.spv-checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--spacing-3);
+}
+
+.spv-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+}
+
+.spv-checkbox__input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.spv-checkbox__label {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+}
+
+/* ==========================================================================
+   SECTION DIVIDER
+   ========================================================================== */
+
+.spv-section-divider {
+  margin: var(--spacing-8) 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ==========================================================================
+   REVIEW SECTION (Step 5)
+   ========================================================================== */
+
+.spv-review-intro {
+  margin-bottom: var(--spacing-6);
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+}
+
+.spv-review-section {
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background-color: var(--color-background);
+  border-radius: var(--radius-lg);
+}
+
+.spv-review-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-3);
+  cursor: pointer;
+}
+
+.spv-review-section__title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.spv-review-section__toggle {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+}
+
+.spv-review-section__content {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+}
+
+.spv-review-section__list {
+  margin: 0;
+  padding-left: var(--spacing-5);
+}
+
+.spv-review-section__list li {
+  margin-bottom: var(--spacing-1);
+}
+
+.spv-review-section__empty {
+  font-style: italic;
+  color: var(--color-text-light);
+}
+
+/* ==========================================================================
+   GENERATE BUTTON
+   ========================================================================== */
+
+.spv-generate-section {
+  text-align: center;
+  padding: var(--spacing-8) var(--spacing-4);
+}
+
+.spv-generate-btn {
+  padding: var(--spacing-4) var(--spacing-8);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.spv-generate-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.spv-generate-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spv-generate-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+}
+
+.spv-generate-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spv-generate-error {
+  margin-top: var(--spacing-4);
+  padding: var(--spacing-3);
+  font-size: var(--font-size-base);
+  color: var(--color-error, #dc2626);
+  background-color: #fef2f2;
+  border-radius: var(--radius-md);
+}
+
+/* ==========================================================================
+   CHARACTER COUNT
+   ========================================================================== */
+
+.spv-char-count {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.spv-char-count--good {
+  color: var(--color-primary);
+}
+
+.spv-char-count__hint {
+  font-style: italic;
+}
+
+/* ==========================================================================
+   FREE FORM TIPS
+   ========================================================================== */
+
+.spv-free-form-tips {
+  margin-top: var(--spacing-8);
+  padding: var(--spacing-4);
+  background-color: var(--color-background);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--color-secondary);
+}
+
+.spv-free-form-tips__title {
+  margin: 0 0 var(--spacing-3) 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.spv-free-form-tips__list {
+  margin: 0;
+  padding-left: var(--spacing-5);
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+}
+
+.spv-free-form-tips__list li {
+  margin-bottom: var(--spacing-2);
+}
