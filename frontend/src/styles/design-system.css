@@ -35,6 +35,7 @@
   --color-text-muted: #6B7280;        /* Secondary text - medium grey */
   --color-text-light: #9CA3AF;        /* Tertiary text - light grey */
   --color-text-inverse: #FFFFFF;      /* Text on dark backgrounds */
+  --color-placeholder: #9CA3AF;       /* Placeholder text in inputs */
 
   /* Semantic colors */
   --color-success: #10B981;           /* Green for success states */

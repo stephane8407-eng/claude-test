@@ -91,6 +91,11 @@ export const authAPI = {
 // ============================================================================
 
 export const villageAPI = {
+  list: async (params = {}) => {
+    const response = await api.get('/api/villages/', { params });
+    return response.data;
+  },
+
   getBySlug: async (slug) => {
     const response = await api.get(`/api/villages/${slug}`);
     return response.data;

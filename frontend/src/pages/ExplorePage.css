@@ -1,0 +1,196 @@
+/**
+ * HomePage Styles
+ */
+
+.spv-home {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 57px); /* Full height minus header */
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   MOBILE FILTER TOGGLE
+   ========================================================================== */
+
+.spv-home__filter-toggle {
+  position: fixed;
+  top: 70px;
+  left: var(--spacing-3);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border: none;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.spv-home__filter-toggle:hover {
+  background-color: var(--color-background);
+}
+
+.spv-home__filter-toggle svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary);
+}
+
+.spv-home__filter-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--spacing-1);
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .spv-home__filter-toggle {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   MAIN CONTENT
+   ========================================================================== */
+
+.spv-home__content {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   MAP AREA
+   ========================================================================== */
+
+.spv-home__map {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+/* Loading State */
+.spv-home__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: var(--spacing-4);
+  color: var(--color-text-muted);
+}
+
+.spv-home__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error State */
+.spv-home__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: var(--spacing-3);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--spacing-4);
+}
+
+.spv-home__error svg {
+  width: 48px;
+  height: 48px;
+  color: var(--color-difficulty-hard);
+}
+
+.spv-home__error button {
+  padding: var(--spacing-2) var(--spacing-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: white;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.spv-home__error button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* ==========================================================================
+   PREVIEW CARD (DESKTOP)
+   ========================================================================== */
+
+.spv-home__preview {
+  display: none;
+  position: absolute;
+  top: var(--spacing-4);
+  right: var(--spacing-4);
+  width: 320px;
+  z-index: 500;
+}
+
+@media (min-width: 768px) {
+  .spv-home__preview {
+    display: block;
+  }
+}
+
+/* ==========================================================================
+   PREVIEW CARD (MOBILE - BOTTOM SHEET)
+   ========================================================================== */
+
+.spv-home__preview-mobile {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: var(--color-surface);
+  border-top-left-radius: var(--radius-xl);
+  border-top-right-radius: var(--radius-xl);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (min-width: 768px) {
+  .spv-home__preview-mobile {
+    display: none;
+  }
+}
+
+/* Override preview card border radius for mobile sheet */
+.spv-home__preview-mobile .spv-village-preview {
+  border-radius: 0;
+  box-shadow: none;
+}

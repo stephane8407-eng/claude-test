@@ -1,269 +1,164 @@
+/**
+ * HomePage - Landing Page
+ *
+ * Simple marketing homepage with hero, CTA, and communes section.
+ * URL: /
+ * Clean, white background, teal accents - NO map on this page.
+ */
 import { Link } from 'react-router-dom';
-import { MapIcon, SparklesIcon, ChartBarIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { MainLayout } from '../components/layout/index';
+import { Button } from '../components/ui';
+import './HomePage.css';
 
 export function HomePage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white">
-        <div className="container mx-auto px-6 py-24">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Discover Your Village's
-              <span className="block text-yellow-400">Hidden History</span>
+    <MainLayout>
+      <div className="spv-landing">
+        {/* Hero Section */}
+        <section className="spv-landing__hero">
+          <div className="spv-landing__hero-content">
+            <h1 className="spv-landing__title">
+              Découvrez le patrimoine caché des villages français
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-12 leading-relaxed">
-              Transform centuries of historical conflicts into engaging tourism experiences
-              with AI-powered insights and interactive maps.
+            <p className="spv-landing__subtitle">
+              Explorez l'histoire, les légendes et les trésors oubliés de nos communes rurales.
+              Une carte interactive pour redécouvrir la France authentique.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/villages/chirac"
-                className="px-8 py-4 bg-yellow-400 text-blue-900 font-bold rounded-lg hover:bg-yellow-300 transition text-lg shadow-xl"
-              >
-                Explore Chirac Demo
+            <div className="spv-landing__cta">
+              <Link to="/explore">
+                <Button variant="primary" size="lg">
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="spv-landing__cta-icon">
+                    <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
+                  </svg>
+                  Explorer la carte
+                </Button>
               </Link>
-              <a
-                href="#demo"
-                className="px-8 py-4 bg-white/10 backdrop-blur text-white font-semibold rounded-lg hover:bg-white/20 transition text-lg border-2 border-white/30"
-              >
-                Request Demo
-              </a>
             </div>
           </div>
-        </div>
 
-        {/* Decorative wave */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" className="w-full h-auto">
-            <path
-              fill="#ffffff"
-              d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
-            ></path>
-          </svg>
-        </div>
-      </section>
-
-      {/* Value Proposition - 3 Key Benefits */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Why SPV Treasure Map?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Three powerful features that transform historical data into tourism revenue
-            </p>
+          {/* Decorative map illustration */}
+          <div className="spv-landing__hero-visual">
+            <div className="spv-landing__map-preview">
+              <svg viewBox="0 0 400 300" fill="none" className="spv-landing__map-svg">
+                {/* Stylized France outline */}
+                <path
+                  d="M200 20 L280 60 L320 120 L340 200 L300 260 L220 280 L140 260 L80 200 L60 140 L100 80 L160 40 Z"
+                  fill="var(--color-primary-light)"
+                  stroke="var(--color-primary)"
+                  strokeWidth="2"
+                />
+                {/* Village markers */}
+                <circle cx="180" cy="140" r="8" fill="var(--color-primary)" />
+                <circle cx="220" cy="180" r="8" fill="var(--color-primary)" />
+                <circle cx="160" cy="200" r="8" fill="var(--color-primary)" />
+                <circle cx="240" cy="120" r="6" fill="var(--color-secondary)" />
+                <circle cx="140" cy="160" r="6" fill="var(--color-secondary)" />
+              </svg>
+            </div>
           </div>
+        </section>
 
-          <div className="grid md:grid-cols-3 gap-12">
-            {/* Benefit 1 */}
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-6">
-                <SparklesIcon className="h-10 w-10 text-blue-600" />
+        {/* Features Section */}
+        <section className="spv-landing__features">
+          <div className="spv-landing__features-grid">
+            <div className="spv-landing__feature">
+              <div className="spv-landing__feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                AI-Powered Identity Analysis
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Our AI analyzes your village's 123 historical conflicts to reveal unique
-                cultural themes and heritage patterns. Automatically generates engaging
-                stories and tourism project ideas.
+              <h3 className="spv-landing__feature-title">Villages historiques</h3>
+              <p className="spv-landing__feature-text">
+                Découvrez des siècles d'histoire locale, des batailles oubliées aux légendes méconnues.
               </p>
             </div>
 
-            {/* Benefit 2 */}
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
-                <MapIcon className="h-10 w-10 text-green-600" />
+            <div className="spv-landing__feature">
+              <div className="spv-landing__feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                Interactive Geospatial Maps
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Beautiful, interactive maps showing conflicts and points of interest.
-                Create walking routes with QR codes. Visitors explore history at their
-                own pace.
+              <h3 className="spv-landing__feature-title">Patrimoine local</h3>
+              <p className="spv-landing__feature-text">
+                Châteaux, chapelles, moulins et forges : explorez les trésors architecturaux.
               </p>
             </div>
 
-            {/* Benefit 3 */}
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-purple-100 rounded-full mb-6">
-                <ChartBarIcon className="h-10 w-10 text-purple-600" />
+            <div className="spv-landing__feature">
+              <div className="spv-landing__feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                Tourism Analytics & Monetization
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Track QR code scans, visitor engagement, and popular routes. Generate
-                branded QR codes for signage. Turn history into measurable tourism revenue.
+              <h3 className="spv-landing__feature-title">Parcours thématiques</h3>
+              <p className="spv-landing__feature-text">
+                Suivez des itinéraires de découverte adaptés à tous les publics.
               </p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Chirac Case Study */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-6">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12">
-              <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                FEATURED CASE STUDY
-              </span>
-              <h2 className="text-4xl font-bold text-gray-800 mt-6 mb-4">
-                Chirac: A Village Transformed
+        {/* Communes Section */}
+        <section className="spv-landing__communes">
+          <div className="spv-landing__communes-content">
+            <div className="spv-landing__communes-text">
+              <span className="spv-landing__communes-badge">Espace communes</span>
+              <h2 className="spv-landing__communes-title">
+                Vous êtes une commune ?
               </h2>
-              <p className="text-xl text-gray-600">
-                2,500 years of history brought to life in one beautiful platform
+              <p className="spv-landing__communes-description">
+                Valorisez l'identité et le patrimoine de votre village.
+                Créez des parcours touristiques, gérez vos points d'intérêt
+                et attirez de nouveaux visiteurs grâce à notre plateforme.
               </p>
+              <Link to="/login">
+                <Button variant="outline" size="lg">
+                  Accéder à l'espace communes
+                </Button>
+              </Link>
             </div>
-
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-              <div className="grid md:grid-cols-2">
-                <div className="p-12 space-y-6">
-                  <h3 className="text-2xl font-bold text-gray-800">The Challenge</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    Chirac had 123 documented historical conflicts spanning from 500 BC
-                    to present day, but no way to showcase this rich heritage to visitors
-                    or generate tourism revenue.
-                  </p>
-
-                  <h3 className="text-2xl font-bold text-gray-800 mt-8">The Solution</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-start">
-                      <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">
-                        <strong>123 conflicts</strong> mapped and categorized
-                      </span>
-                    </div>
-                    <div className="flex items-start">
-                      <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">
-                        <strong>19 POIs</strong> with photos and descriptions
-                      </span>
-                    </div>
-                    <div className="flex items-start">
-                      <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">
-                        <strong>3 AI-generated identity themes</strong> revealing unique heritage
-                      </span>
-                    </div>
-                    <div className="flex items-start">
-                      <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                      <span className="text-gray-700">
-                        <strong>QR-enabled walking routes</strong> for self-guided tours
-                      </span>
-                    </div>
-                  </div>
-
-                  <Link
-                    to="/villages/chirac"
-                    className="inline-block mt-8 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
-                  >
-                    View Chirac Demo →
-                  </Link>
+            <div className="spv-landing__communes-visual">
+              <div className="spv-landing__communes-card">
+                <div className="spv-landing__communes-card-header">
+                  <span className="spv-landing__communes-card-icon">🏛️</span>
+                  <span>Tableau de bord</span>
                 </div>
-
-                <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-12 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <div className="text-6xl font-bold mb-4">123</div>
-                    <div className="text-xl mb-8">Historical Conflicts</div>
-                    <div className="text-6xl font-bold mb-4">19</div>
-                    <div className="text-xl mb-8">Points of Interest</div>
-                    <div className="text-6xl font-bold mb-4">2500+</div>
-                    <div className="text-xl">Years of History</div>
+                <div className="spv-landing__communes-card-stats">
+                  <div className="spv-landing__stat">
+                    <span className="spv-landing__stat-value">123</span>
+                    <span className="spv-landing__stat-label">événements</span>
+                  </div>
+                  <div className="spv-landing__stat">
+                    <span className="spv-landing__stat-value">19</span>
+                    <span className="spv-landing__stat-label">lieux</span>
+                  </div>
+                  <div className="spv-landing__stat">
+                    <span className="spv-landing__stat-value">5</span>
+                    <span className="spv-landing__stat-label">parcours</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Pricing Preview */}
-      <section id="demo" className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Simple, Transparent Pricing
-            </h2>
-            <p className="text-xl text-gray-600 mb-12">
-              One price. Everything included.
+        {/* Footer */}
+        <footer className="spv-landing__footer">
+          <div className="spv-landing__footer-content">
+            <p className="spv-landing__footer-text">
+              SPV Treasure Map — Révéler l'identité des villages français
             </p>
-
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-12 border-2 border-blue-200">
-              <div className="text-6xl font-bold text-blue-900 mb-4">€500</div>
-              <div className="text-2xl text-gray-700 mb-8">per year</div>
-
-              <ul className="text-left max-w-md mx-auto space-y-4 mb-12">
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Unlimited historical conflicts mapping</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Up to 100 points of interest</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">AI-powered identity theme generation</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Unlimited QR codes with analytics</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Custom village branding</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Tourism route creation tools</span>
-                </li>
-              </ul>
-
-              <a
-                href="mailto:contact@spvtreasurehunt.com?subject=Demo Request"
-                className="inline-block px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition text-lg shadow-xl"
-              >
-                Request a Demo
-              </a>
+            <div className="spv-landing__footer-links">
+              <Link to="/a-propos" className="spv-landing__footer-link">À propos</Link>
+              <Link to="/login" className="spv-landing__footer-link">Connexion</Link>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h3 className="text-white font-bold text-xl mb-4">SPV Treasure Map</h3>
-              <p className="text-gray-400">
-                Bringing village history to life through AI and geospatial technology.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2">
-                <li><Link to="/villages/chirac" className="hover:text-white transition">Chirac Demo</Link></li>
-                <li><Link to="/login" className="hover:text-white transition">Partner Login</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Contact</h4>
-              <p className="text-gray-400">
-                Email: contact@spvtreasurehunt.com
-              </p>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-            <p>© 2024 SPV Treasure Map. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+        </footer>
+      </div>
+    </MainLayout>
   );
 }
