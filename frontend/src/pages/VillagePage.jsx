@@ -1,16 +1,25 @@
+/**
+ * VillagePage - Public Village Detail
+ *
+ * Clean white design with teal accents.
+ * NO blue gradients, NO AI terminology, NO confidence scores.
+ */
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { MainLayout } from '../components/layout/index';
 import { villageAPI, poiAPI, identityAPI } from '../services/api';
-import { ConflictTimeline } from '../components/village/ConflictTimeline';
-import { IdentityThemes } from '../components/village/IdentityThemes';
 import { VillageMap } from '../components/village/VillageMap';
-import { POIGallery } from '../components/village/POIGallery';
+import { PublicThemeCard } from '../components/village/PublicThemeCard';
+import { PublicPlaceCard } from '../components/village/PublicPlaceCard';
+import { RouteCard, ThemeChip } from '../components/ui';
+import './VillagePage.css';
 
 export function VillagePage() {
   const { slug } = useParams();
   const [village, setVillage] = useState(null);
   const [pois, setPois] = useState([]);
   const [themes, setThemes] = useState([]);
+  const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -23,16 +32,18 @@ export function VillagePage() {
       setLoading(true);
       const [villageData, poisData, themesData] = await Promise.all([
         villageAPI.getBySlug(slug),
-        poiAPI.list(slug),
-        identityAPI.listThemes(slug)
+        poiAPI.list(slug).catch(() => []),
+        identityAPI.listThemes(slug).catch(() => [])
       ]);
 
       setVillage(villageData);
-      setPois(poisData);
-      setThemes(themesData);
+      setPois(Array.isArray(poisData) ? poisData : []);
+      setThemes(Array.isArray(themesData) ? themesData : []);
+      // TODO: Load routes when API is ready
+      setRoutes([]);
     } catch (err) {
       console.error('Failed to load village data:', err);
-      setError('Failed to load village information');
+      setError('Impossible de charger les informations du village');
     } finally {
       setLoading(false);
     }
@@ -40,183 +51,180 @@ export function VillagePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
-      </div>
+      <MainLayout>
+        <div className="spv-village-loading">
+          <div className="spv-village-loading__spinner" />
+          <span>Chargement...</span>
+        </div>
+      </MainLayout>
     );
   }
 
-  if (error) {
+  if (error || !village) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Oops!</h1>
-          <p className="text-gray-600">{error}</p>
+      <MainLayout>
+        <div className="spv-village-error">
+          <h1>Village introuvable</h1>
+          <p>{error || "Le village demandé n'existe pas."}</p>
+          <Link to="/explore" className="spv-village-error__link">
+            Retour à la carte
+          </Link>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 
-  if (!village) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Village Not Found</h1>
-          <p className="text-gray-600">The village you're looking for doesn't exist.</p>
-        </div>
-      </div>
-    );
-  }
+  // Calculate stats
+  const conflictCount = village.conflict_count || 0;
+  const poiCount = pois.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-blue-900 to-blue-700 text-white">
-        <div className="container mx-auto px-6 py-20">
-          <div className="max-w-4xl">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">
-              {village.name}
-            </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8">
-              {village.tagline || 'Discover the hidden history of our village'}
-            </p>
+    <MainLayout>
+      <div className="spv-village">
+        {/* Header - Clean white, no gradient */}
+        <header className="spv-village__header">
+          <div className="spv-village__header-content">
+            <h1 className="spv-village__name">{village.name}</h1>
 
-            {/* Key Stats Banner */}
-            <div className="grid grid-cols-3 gap-6 mt-12">
-              <div className="text-center">
-                <div className="text-4xl font-bold">{village.conflict_count || 123}</div>
-                <div className="text-blue-200 mt-2">Historical Conflicts</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold">{pois.length}</div>
-                <div className="text-blue-200 mt-2">Points of Interest</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold">2500+</div>
-                <div className="text-blue-200 mt-2">Years of History</div>
-              </div>
+            {village.summary_identity && (
+              <p className="spv-village__tagline">{village.summary_identity}</p>
+            )}
+
+            {/* Metrics as inline badges */}
+            <div className="spv-village__metrics">
+              {conflictCount > 0 && (
+                <span className="spv-village__metric">
+                  {conflictCount} événements historiques
+                </span>
+              )}
+              {poiCount > 0 && (
+                <span className="spv-village__metric">
+                  {poiCount} lieux d'intérêt
+                </span>
+              )}
+              {village.population && (
+                <span className="spv-village__metric">
+                  {village.population} habitants
+                </span>
+              )}
             </div>
+
+            {/* Theme chips */}
+            {village.themes && village.themes.length > 0 && (
+              <div className="spv-village__themes">
+                {village.themes.slice(0, 5).map((theme) => (
+                  <ThemeChip key={theme} theme={theme} size="md" />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      </section>
+        </header>
 
-      {/* Quick Navigation */}
-      <section className="bg-white border-b">
-        <div className="container mx-auto px-6">
-          <nav className="flex space-x-8 py-4">
-            <a href="#map" className="text-gray-700 hover:text-blue-600 transition">Map</a>
-            <a href="#timeline" className="text-gray-700 hover:text-blue-600 transition">Timeline</a>
-            <a href="#identity" className="text-gray-700 hover:text-blue-600 transition">Identity</a>
-            <a href="#pois" className="text-gray-700 hover:text-blue-600 transition">Places</a>
-            <Link to={`/villages/${slug}/routes`} className="text-gray-700 hover:text-blue-600 transition">
-              Tourism Routes
-            </Link>
-          </nav>
-        </div>
-      </section>
+        {/* Long Identity Narrative */}
+        {village.long_identity && (
+          <section className="spv-village__section">
+            <div className="spv-village__narrative">
+              <p>{village.long_identity}</p>
+            </div>
+          </section>
+        )}
 
-      {/* Interactive Map Section */}
-      <section id="map" className="py-16 bg-white">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8">Explore {village.name}</h2>
-          <div className="h-[600px] rounded-lg overflow-hidden shadow-lg">
+        {/* Interactive Map */}
+        <section className="spv-village__section">
+          <h2 className="spv-village__section-title">Explorer {village.name}</h2>
+          <div className="spv-village__map-container">
             <VillageMap
               villageSlug={slug}
               pois={pois}
-              center={{ lat: village.latitude, lng: village.longitude }}
+              center={{ lat: parseFloat(village.latitude), lng: parseFloat(village.longitude) }}
               showConflicts={true}
               showPOIs={true}
             />
           </div>
-          <div className="mt-4 flex space-x-4">
-            <Link
-              to={`/villages/${slug}/conflicts`}
-              className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
-            >
-              View All Conflicts
-            </Link>
-            <Link
-              to={`/villages/${slug}/pois`}
-              className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-            >
-              View All Places
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Identity Themes Section */}
-      {themes.length > 0 && (
-        <section id="identity" className="py-16 bg-gray-50">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                Village Identity & Heritage
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                AI-powered analysis of {village.name}'s historical conflicts reveals unique
-                cultural themes and heritage patterns.
-              </p>
+        {/* Identity Themes - Public friendly display */}
+        {themes.length > 0 && (
+          <section className="spv-village__section spv-village__section--alt">
+            <h2 className="spv-village__section-title">Thèmes & Identité</h2>
+            <div className="spv-village__themes-grid">
+              {themes.slice(0, 3).map((theme, index) => (
+                <PublicThemeCard
+                  key={theme.id || index}
+                  theme={theme}
+                  villageSlug={slug}
+                />
+              ))}
             </div>
-            <IdentityThemes themes={themes} villageSlug={slug} />
+          </section>
+        )}
+
+        {/* Places Section */}
+        {pois.length > 0 && (
+          <section className="spv-village__section">
+            <h2 className="spv-village__section-title">Lieux à découvrir</h2>
+            <div className="spv-village__places-grid">
+              {pois.slice(0, 6).map((poi) => (
+                <PublicPlaceCard
+                  key={poi.id}
+                  place={poi}
+                  villageSlug={slug}
+                />
+              ))}
+            </div>
+            {pois.length > 6 && (
+              <div className="spv-village__more">
+                <Link to={`/villages/${slug}/places`} className="spv-village__more-link">
+                  Voir tous les lieux ({pois.length})
+                </Link>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Routes Section */}
+        {routes.length > 0 && (
+          <section className="spv-village__section spv-village__section--alt">
+            <h2 className="spv-village__section-title">Parcours de découverte</h2>
+            <div className="spv-village__routes-grid">
+              {routes.slice(0, 3).map((route) => (
+                <RouteCard key={route.id} route={route} showVillage={false} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Living Here Section */}
+        {village.live_here_summary && (
+          <section className="spv-village__section">
+            <h2 className="spv-village__section-title">Vivre à {village.name}</h2>
+            <div className="spv-village__living">
+              <p>{village.live_here_summary}</p>
+            </div>
+          </section>
+        )}
+
+        {/* Partners Section - placeholder for sponsors */}
+        {/* TODO: Add SponsorSlots display when API ready */}
+
+        {/* Footer CTA */}
+        <section className="spv-village__cta">
+          <div className="spv-village__cta-content">
+            <h2 className="spv-village__cta-title">Envie de découvrir {village.name} ?</h2>
+            <p className="spv-village__cta-text">
+              Explorez les parcours de découverte et planifiez votre visite.
+            </p>
+            <div className="spv-village__cta-buttons">
+              <Link to={`/villages/${slug}/routes`} className="spv-village__cta-button">
+                Voir les parcours
+              </Link>
+              <Link to="/explore" className="spv-village__cta-button spv-village__cta-button--secondary">
+                Retour à la carte
+              </Link>
+            </div>
           </div>
         </section>
-      )}
-
-      {/* Conflict Timeline Section */}
-      <section id="timeline" className="py-16 bg-white">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8">Historical Timeline</h2>
-          <p className="text-gray-600 mb-8">
-            From ancient times to the present day, explore the conflicts that shaped {village.name}.
-          </p>
-          <ConflictTimeline villageSlug={slug} />
-        </div>
-      </section>
-
-      {/* POI Gallery Section */}
-      {pois.length > 0 && (
-        <section id="pois" className="py-16 bg-gray-50">
-          <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-bold text-gray-800 mb-8">
-              Discover Local Treasures
-            </h2>
-            <POIGallery pois={pois} villageSlug={slug} />
-          </div>
-        </section>
-      )}
-
-      {/* Tourism Routes Section */}
-      <section className="py-16 bg-blue-900 text-white">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-4">Tourism & Walking Routes</h2>
-          <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
-            Discover {village.name} through guided walking routes with QR codes at each stop.
-            Learn the history as you explore.
-          </p>
-          <Link
-            to={`/villages/${slug}/routes`}
-            className="inline-block px-8 py-4 bg-white text-blue-900 font-semibold rounded-md hover:bg-blue-50 transition"
-          >
-            Explore Routes
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-gray-300 py-8">
-        <div className="container mx-auto px-6 text-center">
-          <p className="mb-2">
-            Powered by{' '}
-            <Link to="/" className="text-blue-400 hover:text-blue-300">
-              SPV Treasure Map
-            </Link>
-          </p>
-          <p className="text-sm text-gray-400">
-            Bringing history to life through AI and geospatial technology
-          </p>
-        </div>
-      </footer>
-    </div>
+      </div>
+    </MainLayout>
   );
 }

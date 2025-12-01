@@ -1,0 +1,145 @@
+/**
+ * PublicThemeCard Styles
+ * Clean, friendly cards for public village page
+ */
+
+.spv-theme-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  transition: box-shadow var(--transition-normal);
+}
+
+.spv-theme-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.spv-theme-card__header {
+  margin-bottom: var(--spacing-4);
+}
+
+.spv-theme-card__title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  line-height: var(--line-height-tight);
+}
+
+/* ==========================================================================
+   CONTENT
+   ========================================================================== */
+
+.spv-theme-card__content {
+  flex: 1;
+}
+
+/* Story points */
+.spv-theme-card__story {
+  margin: 0 0 var(--spacing-4) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spv-theme-card__story-item {
+  position: relative;
+  padding-left: var(--spacing-5);
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  line-height: var(--line-height-normal);
+}
+
+.spv-theme-card__story-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-secondary);
+  border-radius: 50%;
+}
+
+/* ==========================================================================
+   PROJECT IDEAS
+   ========================================================================== */
+
+.spv-theme-card__ideas {
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.spv-theme-card__ideas-title {
+  margin: 0 0 var(--spacing-2) 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.spv-theme-card__ideas-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spv-theme-card__idea {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+}
+
+.spv-theme-card__idea-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  color: var(--color-success);
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+
+.spv-theme-card__footer {
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.spv-theme-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.spv-theme-card__link:hover {
+  color: var(--color-primary-hover);
+}
+
+.spv-theme-card__link svg {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--transition-fast);
+}
+
+.spv-theme-card__link:hover svg {
+  transform: translateX(4px);
+}

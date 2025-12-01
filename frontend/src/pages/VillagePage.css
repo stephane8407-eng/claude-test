@@ -1,0 +1,354 @@
+/**
+ * VillagePage Styles
+ * Clean white design, no gradients
+ */
+
+.spv-village {
+  min-height: 100%;
+  background-color: var(--color-surface);
+}
+
+/* ==========================================================================
+   LOADING & ERROR STATES
+   ========================================================================== */
+
+.spv-village-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 57px);
+  gap: var(--spacing-4);
+  color: var(--color-text-muted);
+}
+
+.spv-village-loading__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spv-village-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 57px);
+  gap: var(--spacing-4);
+  text-align: center;
+  padding: var(--spacing-6);
+}
+
+.spv-village-error h1 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  color: var(--color-text);
+}
+
+.spv-village-error p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.spv-village-error__link {
+  padding: var(--spacing-2) var(--spacing-4);
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+}
+
+.spv-village-error__link:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.spv-village__header {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-8) var(--spacing-6);
+}
+
+.spv-village__header-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.spv-village__name {
+  margin: 0 0 var(--spacing-2) 0;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  line-height: var(--line-height-tight);
+}
+
+@media (min-width: 768px) {
+  .spv-village__name {
+    font-size: 36px;
+  }
+}
+
+.spv-village__tagline {
+  margin: 0 0 var(--spacing-4) 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+}
+
+/* Metrics as small inline badges */
+.spv-village__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+}
+
+.spv-village__metric {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  background-color: var(--color-background);
+  border-radius: var(--radius-full);
+}
+
+.spv-village__metric::before {
+  content: '•';
+  margin-right: var(--spacing-2);
+  color: var(--color-secondary);
+}
+
+/* Theme chips in header */
+.spv-village__themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+/* ==========================================================================
+   SECTIONS
+   ========================================================================== */
+
+.spv-village__section {
+  padding: var(--spacing-8) var(--spacing-6);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.spv-village__section--alt {
+  background-color: var(--color-background);
+  max-width: none;
+}
+
+.spv-village__section--alt > * {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.spv-village__section-title {
+  margin: 0 0 var(--spacing-6) 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+/* ==========================================================================
+   NARRATIVE
+   ========================================================================== */
+
+.spv-village__narrative {
+  max-width: 800px;
+}
+
+.spv-village__narrative p {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ==========================================================================
+   MAP
+   ========================================================================== */
+
+.spv-village__map-container {
+  height: 500px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+@media (min-width: 768px) {
+  .spv-village__map-container {
+    height: 550px;
+  }
+}
+
+/* ==========================================================================
+   GRIDS
+   ========================================================================== */
+
+.spv-village__themes-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-6);
+}
+
+@media (min-width: 768px) {
+  .spv-village__themes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .spv-village__themes-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.spv-village__places-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-6);
+}
+
+@media (min-width: 640px) {
+  .spv-village__places-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.spv-village__routes-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-6);
+}
+
+@media (min-width: 768px) {
+  .spv-village__routes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .spv-village__routes-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ==========================================================================
+   MORE LINK
+   ========================================================================== */
+
+.spv-village__more {
+  margin-top: var(--spacing-6);
+  text-align: center;
+}
+
+.spv-village__more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  text-decoration: none;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.spv-village__more-link:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* ==========================================================================
+   LIVING SECTION
+   ========================================================================== */
+
+.spv-village__living {
+  max-width: 800px;
+}
+
+.spv-village__living p {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ==========================================================================
+   CTA SECTION
+   ========================================================================== */
+
+.spv-village__cta {
+  background-color: var(--color-primary-light);
+  padding: var(--spacing-12) var(--spacing-6);
+  text-align: center;
+}
+
+.spv-village__cta-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.spv-village__cta-title {
+  margin: 0 0 var(--spacing-3) 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.spv-village__cta-text {
+  margin: 0 0 var(--spacing-6) 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+}
+
+.spv-village__cta-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-3);
+}
+
+.spv-village__cta-button {
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: white;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+}
+
+.spv-village__cta-button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.spv-village__cta-button--secondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.spv-village__cta-button--secondary:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
