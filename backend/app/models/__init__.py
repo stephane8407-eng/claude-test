@@ -28,6 +28,11 @@ from app.models.sponsor import Sponsor
 from app.models.sponsor_slot import SponsorSlot
 from app.models.project import Project
 
+# Phase D: RAG Foundation
+from app.models.revival_case_study import RevivalCaseStudy
+from app.models.funding_program import FundingProgram
+from app.models.village_identity import VillageIdentity
+
 __all__ = [
     "Battle",
     "Place",
@@ -54,4 +59,8 @@ __all__ = [
     "Sponsor",
     "SponsorSlot",
     "Project",
+    # Phase D: RAG Foundation
+    "RevivalCaseStudy",
+    "FundingProgram",
+    "VillageIdentity",
 ]

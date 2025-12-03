@@ -4,7 +4,7 @@
  */
 
 .spv-results {
-  max-width: 900px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: var(--spacing-6);
 }
@@ -98,7 +98,7 @@
 }
 
 /* ==========================================================================
-   THEMES GRID
+   THEMES GRID - 3-Tier System
    ========================================================================== */
 
 .spv-results__themes-grid {
@@ -113,10 +113,15 @@
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .spv-results__themes-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+/* Ensure consistent card heights in grid */
+.spv-results__themes-grid > * {
+  height: 100%;
 }
 
 /* ==========================================================================

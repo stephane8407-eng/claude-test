@@ -199,6 +199,129 @@ export const identityAPI = {
     const response = await api.post(`/api/villages/${villageSlug}/generate-identity`);
     return response.data;
   },
+
+  // Phase D: Real AI Identity Generation
+  generateIdentity: async (villageSlug, auditData, numOptions = 3) => {
+    const response = await api.post('/api/identity/generate', {
+      village_slug: villageSlug,
+      audit_data: auditData,
+      num_options: numOptions,
+    });
+    return response.data;
+  },
+
+  generateIdentityPreview: async (villageSlug, auditData, numOptions = 3) => {
+    const response = await api.post('/api/identity/generate-preview', {
+      village_slug: villageSlug,
+      audit_data: auditData,
+      num_options: numOptions,
+    });
+    return response.data;
+  },
+
+  getRAGContext: async (villageSlug) => {
+    const response = await api.get(`/api/identity/rag-context/${villageSlug}`);
+    return response.data;
+  },
+
+  getCostEstimate: async () => {
+    const response = await api.get('/api/identity/cost-estimate');
+    return response.data;
+  },
+
+  // Save and publish village identity
+  saveIdentity: async (villageSlug, data) => {
+    const response = await api.put(`/api/villages/${villageSlug}/identity`, data);
+    return response.data;
+  },
+
+  // Get published village identity
+  getIdentity: async (villageSlug) => {
+    const response = await api.get(`/api/villages/${villageSlug}/identity`);
+    return response.data;
+  },
+};
+
+// ============================================================================
+// Case Studies API (Phase D)
+// ============================================================================
+
+export const caseStudiesAPI = {
+  list: async (params = {}) => {
+    const response = await api.get('/api/case-studies/', { params });
+    return response.data;
+  },
+
+  get: async (id) => {
+    const response = await api.get(`/api/case-studies/${id}`);
+    return response.data;
+  },
+
+  create: async (data) => {
+    const response = await api.post('/api/case-studies/', data);
+    return response.data;
+  },
+
+  update: async (id, data) => {
+    const response = await api.put(`/api/case-studies/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id) => {
+    const response = await api.delete(`/api/case-studies/${id}`);
+    return response.data;
+  },
+
+  findSimilar: async (params) => {
+    const response = await api.post('/api/case-studies/find-similar', params);
+    return response.data;
+  },
+
+  getFilters: async () => {
+    const response = await api.get('/api/case-studies/filters');
+    return response.data;
+  },
+};
+
+// ============================================================================
+// Funding Programs API (Phase D)
+// ============================================================================
+
+export const fundingAPI = {
+  list: async (params = {}) => {
+    const response = await api.get('/api/funding-programs/', { params });
+    return response.data;
+  },
+
+  get: async (id) => {
+    const response = await api.get(`/api/funding-programs/${id}`);
+    return response.data;
+  },
+
+  create: async (data) => {
+    const response = await api.post('/api/funding-programs/', data);
+    return response.data;
+  },
+
+  update: async (id, data) => {
+    const response = await api.put(`/api/funding-programs/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id) => {
+    const response = await api.delete(`/api/funding-programs/${id}`);
+    return response.data;
+  },
+
+  match: async (params) => {
+    const response = await api.post('/api/funding-programs/match', params);
+    return response.data;
+  },
+
+  getFilters: async () => {
+    const response = await api.get('/api/funding-programs/filters');
+    return response.data;
+  },
 };
 
 // ============================================================================

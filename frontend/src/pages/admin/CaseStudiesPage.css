@@ -1,0 +1,367 @@
+/**
+ * CaseStudiesPage styles
+ */
+
+.spv-case-studies {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.spv-case-studies__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.spv-case-studies__title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-text, #1F2937);
+  margin: 0 0 4px 0;
+}
+
+.spv-case-studies__subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted, #6B7280);
+  margin: 0;
+}
+
+.spv-case-studies__add-btn {
+  padding: 10px 20px;
+  background: var(--color-primary, #008080);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.spv-case-studies__add-btn:hover {
+  background: #006666;
+}
+
+/* Filters */
+.spv-case-studies__filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.spv-case-studies__search {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 14px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.spv-case-studies__search:focus {
+  outline: none;
+  border-color: var(--color-primary, #008080);
+}
+
+.spv-case-studies__select {
+  padding: 10px 14px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  min-width: 150px;
+}
+
+/* Error */
+.spv-case-studies__error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #FEE2E2;
+  color: #B91C1C;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.spv-case-studies__error button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* Loading */
+.spv-case-studies__loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-muted, #6B7280);
+}
+
+/* Table */
+.spv-case-studies__table-container {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+  overflow: hidden;
+}
+
+.spv-case-studies__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.spv-case-studies__table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #6B7280);
+  background: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.spv-case-studies__table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #E5E7EB;
+  vertical-align: top;
+}
+
+.spv-case-studies__table tr:last-child td {
+  border-bottom: none;
+}
+
+.spv-case-studies__table tr:hover {
+  background: #F9FAFB;
+}
+
+.spv-case-studies__village-name {
+  font-weight: 500;
+  color: var(--color-text, #1F2937);
+}
+
+.spv-case-studies__region {
+  font-size: 12px;
+  color: var(--color-text-muted, #6B7280);
+  margin-top: 2px;
+}
+
+/* Type badge */
+.spv-case-studies__type {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #E5E7EB;
+  color: #374151;
+  text-transform: capitalize;
+}
+
+.spv-case-studies__type--eco_village {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.spv-case-studies__type--artisan_hub {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.spv-case-studies__type--heritage_tourism {
+  background: #E0E7FF;
+  color: #3730A3;
+}
+
+.spv-case-studies__type--remote_work {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.spv-case-studies__type--agriculture {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+/* Themes */
+.spv-case-studies__themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.spv-case-studies__theme-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #F3F4F6;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--color-text-muted, #6B7280);
+}
+
+.spv-case-studies__theme-more {
+  font-size: 11px;
+  color: var(--color-text-muted, #6B7280);
+}
+
+/* Actions */
+.spv-case-studies__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.spv-case-studies__action-btn {
+  padding: 6px 12px;
+  border: 1px solid #E5E7EB;
+  background: white;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.spv-case-studies__action-btn:hover {
+  background: #F3F4F6;
+}
+
+.spv-case-studies__action-btn--danger:hover {
+  background: #FEE2E2;
+  border-color: #FECACA;
+  color: #B91C1C;
+}
+
+/* Empty state */
+.spv-case-studies__empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-muted, #6B7280);
+}
+
+/* Modal */
+.spv-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.spv-modal {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.spv-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.spv-modal__header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.spv-modal__close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text-muted, #6B7280);
+}
+
+.spv-modal__form {
+  padding: 24px;
+}
+
+.spv-modal__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.spv-modal__field {
+  margin-bottom: 16px;
+}
+
+.spv-modal__field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text, #1F2937);
+  margin-bottom: 6px;
+}
+
+.spv-modal__field input,
+.spv-modal__field select,
+.spv-modal__field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.spv-modal__field input:focus,
+.spv-modal__field select:focus,
+.spv-modal__field textarea:focus {
+  outline: none;
+  border-color: var(--color-primary, #008080);
+}
+
+.spv-modal__field textarea {
+  resize: vertical;
+}
+
+.spv-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #E5E7EB;
+  margin-top: 8px;
+}
+
+.spv-modal__btn--secondary {
+  padding: 10px 20px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.spv-modal__btn--primary {
+  padding: 10px 20px;
+  background: var(--color-primary, #008080);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.spv-modal__btn--primary:hover {
+  background: #006666;
+}

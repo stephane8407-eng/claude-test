@@ -10,7 +10,7 @@ import { DashboardHome } from './pages/DashboardHome';
 import { POIManager } from './pages/POIManager';
 import { QRCodeManager } from './pages/QRCodeManager';
 import { DesignSystemPage } from './pages/DesignSystemPage';
-import { IdentityAuditWizard } from './pages/admin/IdentityAuditWizard';
+import { IdentityAuditWizard, CaseStudiesPage, FundingProgramsPage } from './pages/admin';
 
 function App() {
   return (
@@ -41,6 +41,9 @@ function App() {
             <Route path="identity-audit" element={<IdentityAuditWizard />} />
             <Route path="pois" element={<POIManager />} />
             <Route path="qr-codes" element={<QRCodeManager />} />
+            {/* Phase D: Platform Admin Pages */}
+            <Route path="case-studies" element={<CaseStudiesPage />} />
+            <Route path="funding-programs" element={<FundingProgramsPage />} />
           </Route>
 
           {/* 404 - Not Found */}

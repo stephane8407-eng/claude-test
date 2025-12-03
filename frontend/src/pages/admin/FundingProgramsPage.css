@@ -1,0 +1,290 @@
+/**
+ * FundingProgramsPage styles
+ * Reuses most styles from CaseStudiesPage with some additions
+ */
+
+.spv-funding {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.spv-funding__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.spv-funding__title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-text, #1F2937);
+  margin: 0 0 4px 0;
+}
+
+.spv-funding__subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted, #6B7280);
+  margin: 0;
+}
+
+.spv-funding__add-btn {
+  padding: 10px 20px;
+  background: var(--color-primary, #008080);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.spv-funding__add-btn:hover {
+  background: #006666;
+}
+
+/* Filters */
+.spv-funding__filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.spv-funding__search {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 14px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.spv-funding__search:focus {
+  outline: none;
+  border-color: var(--color-primary, #008080);
+}
+
+.spv-funding__select {
+  padding: 10px 14px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  min-width: 150px;
+}
+
+.spv-funding__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.spv-funding__checkbox-label input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Error */
+.spv-funding__error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #FEE2E2;
+  color: #B91C1C;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.spv-funding__error button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* Loading */
+.spv-funding__loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-muted, #6B7280);
+}
+
+/* Table */
+.spv-funding__table-container {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.spv-funding__table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+}
+
+.spv-funding__table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #6B7280);
+  background: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+  white-space: nowrap;
+}
+
+.spv-funding__table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #E5E7EB;
+  vertical-align: top;
+}
+
+.spv-funding__table tr:last-child td {
+  border-bottom: none;
+}
+
+.spv-funding__table tr:hover {
+  background: #F9FAFB;
+}
+
+.spv-funding__program-name {
+  font-weight: 500;
+  color: var(--color-text, #1F2937);
+}
+
+.spv-funding__deadline-type {
+  font-size: 12px;
+  color: var(--color-text-muted, #6B7280);
+  margin-top: 2px;
+}
+
+/* Amount */
+.spv-funding__amount {
+  font-weight: 500;
+}
+
+.spv-funding__percentage {
+  font-size: 12px;
+  color: var(--color-text-muted, #6B7280);
+}
+
+.spv-funding__na {
+  color: #D1D5DB;
+}
+
+/* Type badge */
+.spv-funding__type {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #E5E7EB;
+  color: #374151;
+}
+
+.spv-funding__type--grant {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.spv-funding__type--loan {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.spv-funding__type--subsidy {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.spv-funding__type--tax_credit {
+  background: #E0E7FF;
+  color: #3730A3;
+}
+
+/* Status badge */
+.spv-funding__status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.spv-funding__status--active {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.spv-funding__status--inactive {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+/* Themes */
+.spv-funding__themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.spv-funding__theme-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #F3F4F6;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--color-text-muted, #6B7280);
+}
+
+.spv-funding__theme-more {
+  font-size: 11px;
+  color: var(--color-text-muted, #6B7280);
+}
+
+/* Actions */
+.spv-funding__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.spv-funding__action-btn {
+  padding: 6px 12px;
+  border: 1px solid #E5E7EB;
+  background: white;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.spv-funding__action-btn:hover {
+  background: #F3F4F6;
+}
+
+.spv-funding__action-btn--danger:hover {
+  background: #FEE2E2;
+  border-color: #FECACA;
+  color: #B91C1C;
+}
+
+/* Empty state */
+.spv-funding__empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-muted, #6B7280);
+}

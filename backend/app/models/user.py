@@ -58,6 +58,11 @@ class User(Base):
             "last_login_at": self.last_login_at.isoformat() if self.last_login_at else None,
         }
 
+        # Include village slug if user has a village
+        if self.village:
+            data["village_slug"] = self.village.slug
+            data["village_name"] = self.village.name
+
         # Never include password_hash in API responses unless explicitly needed
         if include_sensitive:
             data["password_hash"] = self.password_hash

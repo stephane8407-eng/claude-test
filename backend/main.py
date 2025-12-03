@@ -105,6 +105,12 @@ from app.api.sponsors import router as sponsors_router
 from app.api.projects import router as projects_router
 from app.api.upload import router as upload_router
 
+# Phase D: RAG Foundation
+from app.api.case_studies import router as case_studies_router
+from app.api.funding_programs import router as funding_programs_router
+from app.api.identity_generation import router as identity_generation_router
+from app.api.village_identity import router as village_identity_router
+
 app.include_router(battles_router)
 app.include_router(places_router)
 app.include_router(conflicts_router)
@@ -119,6 +125,12 @@ app.include_router(topics_router)
 app.include_router(sponsors_router)
 app.include_router(projects_router)
 app.include_router(upload_router)
+
+# Phase D: RAG Foundation
+app.include_router(case_studies_router)
+app.include_router(funding_programs_router)
+app.include_router(identity_generation_router)
+app.include_router(village_identity_router)
 
 
 # ============================================================================

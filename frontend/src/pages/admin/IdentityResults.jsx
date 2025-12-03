@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminThemeCard } from './components/AdminThemeCard';
 import { ProjectSuggestionCard } from './components/ProjectSuggestionCard';
+import { identityAPI } from '../../services/api';
 import './IdentityResults.css';
 
 export function IdentityResults({ results, villageSlug, onRegenerate, onBackToEdit }) {
@@ -50,38 +51,49 @@ export function IdentityResults({ results, villageSlug, onRegenerate, onBackToEd
       // Prepare accepted themes
       const themesToSave = results.themes
         ?.filter((_, i) => acceptedThemes[i])
-        .map(theme => ({
-          theme_name: theme.title,
-          confidence_score: theme.confidence,
-          theme_story: theme.description?.join(' '),
-          project_ideas: theme.tourism_ideas?.map(idea => ({ title: idea })),
-        })) || [];
+        .map(theme => {
+          // Handle both formats for theme name
+          const themeName = theme.title || theme.name || 'Untitled';
 
-      // Prepare projects
+          // Handle description as array or string
+          let themeStory = '';
+          if (Array.isArray(theme.description)) {
+            themeStory = theme.description.join(' ');
+          } else if (typeof theme.description === 'string') {
+            themeStory = theme.description;
+          }
+
+          // Handle tourism ideas as array of strings or objects
+          const tourismIdeas = theme.tourism_ideas || theme.tourismIdeas || [];
+          const projectIdeas = tourismIdeas.map(idea =>
+            typeof idea === 'string' ? { title: idea } : { title: idea.title || idea }
+          );
+
+          return {
+            theme_name: themeName,
+            confidence_score: theme.confidence,
+            theme_story: themeStory,
+            project_ideas: projectIdeas,
+          };
+        }) || [];
+
+      // Prepare projects - handle both field name formats
       const projectsToSave = projects.map(p => ({
         title: p.title,
-        short_description: p.short_description,
+        short_description: p.short_description || p.description || '',
         themes: p.themes,
         status: 'idea',
         source: 'ai_suggested',
       }));
 
-      // Save identity to village
-      const response = await fetch(`/api/villages/${villageSlug}/identity`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          summary_identity: summaryIdentity,
-          long_identity: longIdentity,
-          live_here_summary: liveHereSummary,
-          themes: themesToSave,
-          projects: projectsToSave,
-        }),
+      // Save identity to village using API service (includes auth token)
+      await identityAPI.saveIdentity(villageSlug, {
+        summary_identity: summaryIdentity,
+        long_identity: longIdentity,
+        live_here_summary: liveHereSummary,
+        themes: themesToSave,
+        projects: projectsToSave,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to save identity');
-      }
 
       // Clear draft from localStorage
       localStorage.removeItem('spv_identity_audit_draft');
