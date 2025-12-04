@@ -10,7 +10,7 @@ import { DashboardHome } from './pages/DashboardHome';
 import { POIManager } from './pages/POIManager';
 import { QRCodeManager } from './pages/QRCodeManager';
 import { DesignSystemPage } from './pages/DesignSystemPage';
-import { IdentityAuditWizard, CaseStudiesPage, FundingProgramsPage } from './pages/admin';
+import { IdentityAuditWizard, CaseStudiesPage, FundingProgramsPage, ProjectKanbanPage } from './pages/admin';
 
 function App() {
   return (
@@ -44,6 +44,8 @@ function App() {
             {/* Phase D: Platform Admin Pages */}
             <Route path="case-studies" element={<CaseStudiesPage />} />
             <Route path="funding-programs" element={<FundingProgramsPage />} />
+            {/* Phase E: Project Management Dashboard */}
+            <Route path="projects" element={<ProjectKanbanPage />} />
           </Route>
 
           {/* 404 - Not Found */}

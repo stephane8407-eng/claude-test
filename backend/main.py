@@ -111,6 +111,9 @@ from app.api.funding_programs import router as funding_programs_router
 from app.api.identity_generation import router as identity_generation_router
 from app.api.village_identity import router as village_identity_router
 
+# Phase E: Project Management Dashboard
+from app.api.project_kanban import router as project_kanban_router
+
 app.include_router(battles_router)
 app.include_router(places_router)
 app.include_router(conflicts_router)
@@ -131,6 +134,9 @@ app.include_router(case_studies_router)
 app.include_router(funding_programs_router)
 app.include_router(identity_generation_router)
 app.include_router(village_identity_router)
+
+# Phase E: Project Management Dashboard
+app.include_router(project_kanban_router)
 
 
 # ============================================================================

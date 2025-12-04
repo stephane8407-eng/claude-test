@@ -7,3 +7,6 @@ export { IdentityResults } from './IdentityResults';
 // Phase D: RAG Data Management
 export { CaseStudiesPage } from './CaseStudiesPage';
 export { FundingProgramsPage } from './FundingProgramsPage';
+
+// Phase E: Project Management Dashboard
+export { ProjectKanbanPage } from './ProjectKanbanPage';

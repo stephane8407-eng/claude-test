@@ -1,7 +1,22 @@
 @import "tailwindcss";
 
+/* Tell Tailwind v4 where to scan for classes */
+@source "../index.html";
+@source "./**/*.{js,jsx,ts,tsx}";
+
 /* SPV Design System */
 @import "./styles/design-system.css";
+
+/* Tailwind v4 theme customization via CSS */
+@theme {
+  /* Custom colors */
+  --color-primary: #008080;
+  --color-primary-hover: #006666;
+  --color-primary-light: #e6f3f3;
+  --color-secondary: #C8A2C8;
+  --color-secondary-hover: #b88fb8;
+  --color-secondary-light: #f5eef5;
+}
 
 /* Note: CSS custom properties from design-system.css are available globally.
    Use them in Tailwind with arbitrary values: bg-[var(--color-primary)] */

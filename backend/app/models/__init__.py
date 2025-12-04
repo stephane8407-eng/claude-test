@@ -33,6 +33,11 @@ from app.models.revival_case_study import RevivalCaseStudy
 from app.models.funding_program import FundingProgram
 from app.models.village_identity import VillageIdentity
 
+# Phase E: Project Management Dashboard
+from app.models.project_instance import ProjectInstance
+from app.models.grant_application import GrantApplication
+from app.models.village_media import VillageMedia
+
 __all__ = [
     "Battle",
     "Place",
@@ -63,4 +68,8 @@ __all__ = [
     "RevivalCaseStudy",
     "FundingProgram",
     "VillageIdentity",
+    # Phase E: Project Management Dashboard
+    "ProjectInstance",
+    "GrantApplication",
+    "VillageMedia",
 ]
