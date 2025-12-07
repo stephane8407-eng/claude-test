@@ -1,5 +1,15 @@
 """
 FundingProgram model - Grants and funding opportunities for village projects
+
+Updated for Phase E Week 2: Includes 8 new columns from funding_programs_import_matched.sql:
+- level: European, National, Regional, Departmental, Intercommunal
+- eligible_population_bands: Array of population bands like '<2000', '2000-5000', etc.
+- eligible_regions: Array of eligible regions
+- description: Program description
+- website_url: Official website
+- requirements: Eligibility requirements text
+- required_documents: Documents needed for application
+- funding_percentage_min: Minimum funding percentage
 """
 from sqlalchemy import Column, Integer, String, Text, TIMESTAMP, ARRAY, Boolean, Date
 from sqlalchemy.sql import func
@@ -13,25 +23,35 @@ class FundingProgram(Base):
 
     # Basic info
     name = Column(String(255), nullable=False)
-    provider = Column(String(255), nullable=False)  # 'EU', 'État', 'Région', 'Fondation'
+    provider = Column(String(255), nullable=False)  # 'Commission Européenne', 'Ministère', 'Région', etc.
     country = Column(String(100), nullable=False, index=True)
+    level = Column(String(50), index=True)  # 'European', 'National', 'Regional', 'Departmental', 'Intercommunal'
 
     # Eligibility
     eligible_themes = Column(ARRAY(Text))  # 'heritage', 'ecology', 'tourism', etc.
-    eligible_population_max = Column(Integer)  # NULL if no limit
+    eligible_population_max = Column(Integer)  # NULL if no limit (legacy)
+    eligible_population_bands = Column(ARRAY(Text))  # ['<2000', '2000-5000', '5000-10000', etc.]
+    eligible_regions = Column(ARRAY(Text))  # ['Nouvelle-Aquitaine', 'All regions', etc.]
 
     # Funding details
     funding_type = Column(String(50))  # 'grant', 'loan', 'subsidy', 'tax_credit'
     amount_min = Column(Integer)
     amount_max = Column(Integer)
+    funding_percentage_min = Column(Integer)  # e.g., 20 for "from 20%"
     funding_percentage_max = Column(Integer)  # e.g., 80 for "up to 80%"
 
+    # Description and requirements
+    description = Column(Text)  # Full program description
+    requirements = Column(Text)  # Eligibility requirements
+    required_documents = Column(Text)  # Documents needed for application
+
     # Application info
-    application_url = Column(Text)
-    deadline_type = Column(String(50))  # 'rolling', 'annual', 'quarterly', 'one_time'
+    website_url = Column(Text)  # Official program website
+    application_url = Column(Text)  # Direct application link
+    deadline_type = Column(String(50))  # 'rolling', 'annual', 'quarterly', 'one_time', 'permanent'
     deadline_date = Column(Date)  # Specific deadline if applicable
 
-    # Process guidance
+    # Process guidance (legacy fields)
     process_summary = Column(Text)  # Step-by-step overview
     typical_timeline_months = Column(Integer)  # How long to get approval
     tips = Column(Text)  # Best practices from successful applications
@@ -60,12 +80,20 @@ class FundingProgram(Base):
             "name": self.name,
             "provider": self.provider,
             "country": self.country,
+            "level": self.level,
             "eligible_themes": self.eligible_themes or [],
             "eligible_population_max": self.eligible_population_max,
+            "eligible_population_bands": self.eligible_population_bands or [],
+            "eligible_regions": self.eligible_regions or [],
             "funding_type": self.funding_type,
             "amount_min": self.amount_min,
             "amount_max": self.amount_max,
+            "funding_percentage_min": self.funding_percentage_min,
             "funding_percentage_max": self.funding_percentage_max,
+            "description": self.description,
+            "requirements": self.requirements,
+            "required_documents": self.required_documents,
+            "website_url": self.website_url,
             "application_url": self.application_url,
             "deadline_type": self.deadline_type,
             "deadline_date": self.deadline_date.isoformat() if self.deadline_date else None,

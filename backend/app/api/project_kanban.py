@@ -42,6 +42,11 @@ class ProjectInstanceUpdate(BaseModel):
     timeline_actual_months: Optional[int] = None
     completed_steps: Optional[List[str]] = None
     next_steps: Optional[List[str]] = None
+    # Phase E Week 2.5: Enhanced project data fields
+    budget_estimated_min: Optional[int] = None
+    budget_estimated_max: Optional[int] = None
+    timeline_months: Optional[int] = None
+    project_data: Optional[dict] = None  # JSONB field for all extended data
 
 
 class ProjectStatusUpdate(BaseModel):
@@ -286,6 +291,23 @@ def update_kanban_project(
 
     if project_update.next_steps is not None:
         project.next_steps = project_update.next_steps
+
+    # Phase E Week 2.5: Handle budget and timeline fields
+    if project_update.budget_estimated_min is not None:
+        project.budget_estimated_min = project_update.budget_estimated_min
+
+    if project_update.budget_estimated_max is not None:
+        project.budget_estimated_max = project_update.budget_estimated_max
+
+    if project_update.timeline_months is not None:
+        project.timeline_months = project_update.timeline_months
+
+    # Handle project_data JSONB field (merge with existing data)
+    if project_update.project_data is not None:
+        existing_data = project.project_data or {}
+        # Merge new data with existing, new values override
+        merged_data = {**existing_data, **project_update.project_data}
+        project.project_data = merged_data
 
     project.updated_at = datetime.now()
 

@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
+/* SPV Design System - MUST come before @source directives in Tailwind v4 */
+@import "./styles/design-system.css";
+
 /* Tell Tailwind v4 where to scan for classes */
 @source "../index.html";
 @source "./**/*.{js,jsx,ts,tsx}";
-
-/* SPV Design System */
-@import "./styles/design-system.css";
 
 /* Tailwind v4 theme customization via CSS */
 @theme {

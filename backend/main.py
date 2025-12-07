@@ -114,6 +114,9 @@ from app.api.village_identity import router as village_identity_router
 # Phase E: Project Management Dashboard
 from app.api.project_kanban import router as project_kanban_router
 
+# Phase E Week 2: Grant Application Generator
+from app.api.grants import router as grants_router
+
 app.include_router(battles_router)
 app.include_router(places_router)
 app.include_router(conflicts_router)
@@ -137,6 +140,9 @@ app.include_router(village_identity_router)
 
 # Phase E: Project Management Dashboard
 app.include_router(project_kanban_router)
+
+# Phase E Week 2: Grant Application Generator
+app.include_router(grants_router)
 
 
 # ============================================================================
