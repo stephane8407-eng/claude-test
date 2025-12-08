@@ -1,0 +1,311 @@
+"""
+SQLAlchemy models for Phase E: Project Management
+"""
+from sqlalchemy import Column, Integer, String, Text, Boolean, TIMESTAMP, ForeignKey, ARRAY, CheckConstraint, JSON
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from datetime import datetime
+from typing import Optional, List, Dict, Any
+
+from app.database import Base
+
+
+class VillageIdentity(Base):
+    """Saved 3-tier identity generations from AI"""
+    __tablename__ = "village_identities"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    village_id = Column(Integer, ForeignKey('places.id', ondelete='CASCADE'), nullable=False)
+    
+    # Identity content
+    identity_tier = Column(String(50), nullable=False)  # 'proven', 'innovation', 'breakthrough'
+    identity_name = Column(String(255), nullable=False)
+    identity_narrative = Column(Text, nullable=False)
+    
+    # Generated projects (JSONB array)
+    projects = Column(JSON, nullable=False, default=list)
+    
+    # Metadata
+    generated_at = Column(TIMESTAMP, default=func.now())
+    is_published = Column(Boolean, default=False)
+    published_at = Column(TIMESTAMP)
+    version = Column(Integer, default=1)
+    
+    # Audit trail
+    created_by = Column(Integer, ForeignKey('users.id'))
+    created_at = Column(TIMESTAMP, default=func.now())
+    updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    place = relationship("Place")
+    project_instances = relationship("ProjectInstance", back_populates="identity")
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "village_id": self.village_id,
+            "identity_tier": self.identity_tier,
+            "identity_name": self.identity_name,
+            "identity_narrative": self.identity_narrative,
+            "projects": self.projects,
+            "generated_at": self.generated_at.isoformat() if self.generated_at else None,
+            "is_published": self.is_published,
+            "published_at": self.published_at.isoformat() if self.published_at else None,
+            "version": self.version,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+class ProjectInstance(Base):
+    """Track execution of village projects (Kanban-style)"""
+    __tablename__ = "project_instances"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    village_id = Column(Integer, ForeignKey('places.id', ondelete='CASCADE'), nullable=False)
+    identity_id = Column(Integer, ForeignKey('village_identities.id', ondelete='SET NULL'))
+    
+    # Project data
+    project_data = Column(JSON, nullable=False)
+    
+    # Execution tracking
+    status = Column(String(20), default='exploring')  # exploring, planning, in_progress, completed, abandoned
+    priority = Column(Integer, CheckConstraint('priority >= 1 AND priority <= 5'), default=3)
+    
+    # Project details
+    notes = Column(Text)
+    budget_estimated_min = Column(Integer)  # Euros
+    budget_estimated_max = Column(Integer)  # Euros
+    budget_actual = Column(Integer)  # Actual spent
+    
+    timeline_months = Column(Integer)  # Expected duration
+    timeline_actual_months = Column(Integer)  # Actual duration
+    
+    # Progress tracking
+    completed_steps = Column(ARRAY(Text), default=list)
+    next_steps = Column(ARRAY(Text), default=list)
+    
+    # Attachments
+    attachments = Column(JSON, default=list)
+    
+    # Timestamps
+    started_at = Column(TIMESTAMP)
+    completed_at = Column(TIMESTAMP)
+    abandoned_at = Column(TIMESTAMP)
+    created_at = Column(TIMESTAMP, default=func.now())
+    updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    place = relationship("Place")
+    identity = relationship("VillageIdentity", back_populates="project_instances")
+    grant_applications = relationship("GrantApplication", back_populates="project")
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "village_id": self.village_id,
+            "identity_id": self.identity_id,
+            "project_data": self.project_data,
+            "status": self.status,
+            "priority": self.priority,
+            "notes": self.notes,
+            "budget_estimated_min": self.budget_estimated_min,
+            "budget_estimated_max": self.budget_estimated_max,
+            "budget_actual": self.budget_actual,
+            "timeline_months": self.timeline_months,
+            "timeline_actual_months": self.timeline_actual_months,
+            "completed_steps": self.completed_steps,
+            "next_steps": self.next_steps,
+            "attachments": self.attachments,
+            "started_at": self.started_at.isoformat() if self.started_at else None,
+            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
+            "abandoned_at": self.abandoned_at.isoformat() if self.abandoned_at else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+class FundingProgram(Base):
+    """Database of available grants and funding programs"""
+    __tablename__ = "funding_programs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    
+    # Program identification
+    name = Column(String(255), nullable=False)
+    organization = Column(String(255), nullable=False)
+    program_type = Column(String(100))
+    
+    # Eligibility
+    eligible_countries = Column(ARRAY(Text), default=['FR'])
+    eligible_regions = Column(ARRAY(Text))
+    eligible_population_bands = Column(ARRAY(Text))
+    eligible_themes = Column(ARRAY(Text))
+    
+    # Funding details
+    amount_min = Column(Integer)  # Minimum grant amount (euros)
+    amount_max = Column(Integer)  # Maximum grant amount (euros)
+    funding_percentage_min = Column(Integer)
+    funding_percentage_max = Column(Integer)
+    
+    # Application details
+    description = Column(Text)
+    website_url = Column(String(500))
+    application_url = Column(String(500))
+    deadline_type = Column(String(50))  # 'annual', 'rolling', 'one-time'
+    next_deadline = Column(TIMESTAMP)
+    
+    # Requirements
+    requirements = Column(Text)
+    required_documents = Column(ARRAY(Text))
+    
+    # Metadata
+    is_active = Column(Boolean, default=True)
+    created_at = Column(TIMESTAMP, default=func.now())
+    updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    grant_applications = relationship("GrantApplication", back_populates="funding_program")
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "organization": self.organization,
+            "program_type": self.program_type,
+            "eligible_countries": self.eligible_countries,
+            "eligible_regions": self.eligible_regions,
+            "eligible_population_bands": self.eligible_population_bands,
+            "eligible_themes": self.eligible_themes,
+            "amount_min": self.amount_min,
+            "amount_max": self.amount_max,
+            "funding_percentage_min": self.funding_percentage_min,
+            "funding_percentage_max": self.funding_percentage_max,
+            "description": self.description,
+            "website_url": self.website_url,
+            "application_url": self.application_url,
+            "deadline_type": self.deadline_type,
+            "next_deadline": self.next_deadline.isoformat() if self.next_deadline else None,
+            "requirements": self.requirements,
+            "required_documents": self.required_documents,
+            "is_active": self.is_active
+        }
+
+
+class GrantApplication(Base):
+    """Track grant applications for projects"""
+    __tablename__ = "grant_applications"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey('project_instances.id', ondelete='CASCADE'), nullable=False)
+    funding_program_id = Column(Integer, ForeignKey('funding_programs.id', ondelete='SET NULL'))
+    
+    # Application status
+    status = Column(String(50), default='draft')  # draft, submitted, under_review, approved, rejected, abandoned
+    
+    # Generated content
+    generated_content = Column(Text)  # Full application text from Claude
+    
+    # Submission details
+    amount_requested = Column(Integer)  # Euros
+    amount_approved = Column(Integer)  # Euros (if approved)
+    
+    submitted_date = Column(TIMESTAMP)
+    decision_date = Column(TIMESTAMP)
+    decision_notes = Column(Text)
+    
+    # Documents
+    documents = Column(JSON, default=list)
+    
+    # Notes
+    notes = Column(Text)
+    
+    # Timestamps
+    created_at = Column(TIMESTAMP, default=func.now())
+    updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    project = relationship("ProjectInstance", back_populates="grant_applications")
+    funding_program = relationship("FundingProgram", back_populates="grant_applications")
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "funding_program_id": self.funding_program_id,
+            "status": self.status,
+            "generated_content": self.generated_content,
+            "amount_requested": self.amount_requested,
+            "amount_approved": self.amount_approved,
+            "submitted_date": self.submitted_date.isoformat() if self.submitted_date else None,
+            "decision_date": self.decision_date.isoformat() if self.decision_date else None,
+            "decision_notes": self.decision_notes,
+            "documents": self.documents,
+            "notes": self.notes,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+class VillageMedia(Base):
+    """Photos, videos, documents uploaded by village admins"""
+    __tablename__ = "village_media"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    village_id = Column(Integer, ForeignKey('places.id', ondelete='CASCADE'), nullable=False)
+    
+    # Media type
+    media_type = Column(String(20), nullable=False)  # 'photo', 'video', 'document'
+    category = Column(String(50))  # 'heritage', 'nature', 'community', 'economy', 'events'
+    
+    # File details
+    url = Column(String(500), nullable=False)
+    thumbnail_url = Column(String(500))
+    filename = Column(String(255))
+    file_size = Column(Integer)  # Bytes
+    mime_type = Column(String(100))
+    
+    # Metadata
+    caption = Column(Text)
+    alt_text = Column(String(255))
+    
+    # AUTOMATIC GEOLOCATION FROM EXIF
+    latitude = Column(Integer)  # Extracted from GPS EXIF
+    longitude = Column(Integer)
+    photo_taken_at = Column(TIMESTAMP)  # From EXIF DateTimeOriginal
+    suggested_poi_id = Column(Integer, ForeignKey('places.id'))  # Auto-match to nearest POI
+    
+    # Display settings
+    is_hero = Column(Boolean, default=False)
+    display_order = Column(Integer, default=0)
+    is_published = Column(Boolean, default=True)
+    
+    # Audit
+    uploaded_by = Column(Integer, ForeignKey('users.id'))
+    created_at = Column(TIMESTAMP, default=func.now())
+    
+    # Relationships
+    place = relationship("Place", foreign_keys=[village_id])
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "village_id": self.village_id,
+            "media_type": self.media_type,
+            "category": self.category,
+            "url": self.url,
+            "thumbnail_url": self.thumbnail_url,
+            "filename": self.filename,
+            "file_size": self.file_size,
+            "mime_type": self.mime_type,
+            "caption": self.caption,
+            "alt_text": self.alt_text,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "photo_taken_at": self.photo_taken_at.isoformat() if self.photo_taken_at else None,
+            "suggested_poi_id": self.suggested_poi_id,
+            "is_hero": self.is_hero,
+            "display_order": self.display_order,
+            "is_published": self.is_published,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }

@@ -1,0 +1,695 @@
+/* ============================================
+   SPV Treasure Map - Project Dashboard
+   Professional Kanban Board Styling
+   ============================================ */
+
+/* Page Container */
+.project-management-page {
+  min-height: 100vh;
+  background: #F5F5F5;
+  padding: 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Header */
+.dashboard-header {
+  margin-bottom: 32px;
+}
+
+.dashboard-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1F2937;
+  margin: 0 0 8px 0;
+}
+
+.dashboard-header p {
+  font-size: 16px;
+  color: #6B7280;
+  margin: 0;
+}
+
+/* Kanban Board */
+.kanban-board {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 16px;
+}
+
+/* Kanban Columns */
+.kanban-column {
+  flex: 0 0 300px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 500px;
+}
+
+.kanban-column.exploring {
+  background: linear-gradient(180deg, #F9FAFB 0%, #FFFFFF 100%);
+  border-top: 4px solid #9CA3AF;
+}
+
+.kanban-column.planning {
+  background: linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%);
+  border-top: 4px solid #3B82F6;
+}
+
+.kanban-column.in-progress {
+  background: linear-gradient(180deg, #FEF3C7 0%, #FFFFFF 100%);
+  border-top: 4px solid #F59E0B;
+}
+
+.kanban-column.completed {
+  background: linear-gradient(180deg, #D1FAE5 0%, #FFFFFF 100%);
+  border-top: 4px solid #10B981;
+}
+
+.kanban-column.abandoned {
+  background: linear-gradient(180deg, #F3F4F6 0%, #FFFFFF 100%);
+  border-top: 4px solid #6B7280;
+}
+
+/* Column Headers */
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.column-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.column-count {
+  background: rgba(0, 128, 128, 0.1);
+  color: #008080;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Project Cards */
+.project-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 128, 128, 0.15);
+  border-color: #008080;
+}
+
+.project-card:last-child {
+  margin-bottom: 0;
+}
+
+/* Card Content */
+.project-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1F2937;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.project-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Priority Badges */
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.priority-high {
+  background: rgba(239, 68, 68, 0.1);
+  color: #DC2626;
+}
+
+.priority-medium {
+  background: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+}
+
+.priority-low {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16A34A;
+}
+
+/* Grant Badge */
+.project-grant-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 128, 128, 0.1);
+  color: #008080;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.project-grant-badge.no-grants {
+  opacity: 0.6;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+}
+
+/* Meta Info */
+.project-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #6B7280;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Explore Funding Button */
+.explore-funding-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #008080 0%, #006666 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.explore-funding-btn:hover {
+  background: linear-gradient(135deg, #006666 0%, #004d4d 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 128, 128, 0.3);
+}
+
+/* Empty State */
+.column-empty-state {
+  text-align: center;
+  padding: 48px 16px;
+  color: #9CA3AF;
+}
+
+.column-empty-state p {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Tier Badge */
+.tier-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.tier-proven {
+  background: rgba(139, 92, 246, 0.1);
+  color: #7C3AED;
+}
+
+.tier-innovation {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563EB;
+}
+
+.tier-breakthrough {
+  background: rgba(236, 72, 153, 0.1);
+  color: #DB2777;
+}
+
+/* ============================================
+   PROJECT DETAIL PANEL STYLING
+   ============================================ */
+
+/* Panel Container */
+.project-detail-modal {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-top: 3px solid #008080;
+}
+
+/* Panel Header */
+.panel-header {
+  padding: 24px 24px 16px;
+  border-bottom: 2px solid #F3F4F6;
+  position: relative;
+}
+
+.panel-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1F2937;
+  margin: 0 0 8px 0;
+  padding-right: 40px;
+}
+
+.panel-subtitle {
+  font-size: 14px;
+  color: #6B7280;
+  margin: 0;
+}
+
+.panel-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #F3F4F6;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #6B7280;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel-close-btn:hover {
+  background: #E5E7EB;
+  color: #1F2937;
+}
+
+/* Status Badges in Panel */
+.panel-status-badges {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.panel-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.panel-status-badge.status {
+  background: rgba(0, 128, 128, 0.1);
+  color: #008080;
+}
+
+.panel-status-badge.tier {
+  background: rgba(139, 92, 246, 0.1);
+  color: #7C3AED;
+}
+
+/* Tabs */
+.panel-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 24px;
+  border-bottom: 2px solid #E5E7EB;
+  background: #FAFAFA;
+}
+
+.panel-tab {
+  padding: 14px 24px;
+  border: none;
+  background: transparent;
+  color: #6B7280;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.panel-tab:hover {
+  color: #008080;
+  background: rgba(0, 128, 128, 0.05);
+}
+
+.panel-tab.active {
+  color: #008080;
+  border-bottom-color: #008080;
+  background: #FFFFFF;
+}
+
+.tab-badge {
+  display: inline-block;
+  background: rgba(0, 128, 128, 0.15);
+  color: #008080;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+/* Panel Content */
+.panel-content {
+  padding: 24px;
+}
+
+/* Details Grid */
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Detail Section */
+.detail-section {
+  margin-bottom: 24px;
+}
+
+.detail-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.detail-value {
+  font-size: 16px;
+  color: #1F2937;
+  line-height: 1.6;
+}
+
+.detail-value.large {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.detail-value.description {
+  background: #F9FAFB;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #E5E7EB;
+}
+
+/* Budget Display */
+.budget-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #008080;
+}
+
+/* Timeline Display */
+.timeline-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #1F2937;
+}
+
+/* Priority Display */
+.priority-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.priority-display.high {
+  background: rgba(239, 68, 68, 0.1);
+  color: #DC2626;
+}
+
+.priority-display.medium-high {
+  background: rgba(249, 115, 22, 0.1);
+  color: #EA580C;
+}
+
+.priority-display.medium {
+  background: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+}
+
+.priority-display.medium-low {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16A34A;
+}
+
+.priority-display.low {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16A34A;
+}
+
+/* Mayor's Notes */
+.mayors-notes {
+  background: linear-gradient(135deg, #F0FDFA 0%, #F9FAFB 100%);
+  border-left: 4px solid #008080;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.mayors-notes-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #008080;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.mayors-notes-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #1F2937;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.mayors-notes-textarea:focus {
+  outline: none;
+  border-color: #008080;
+  box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+}
+
+.mayors-notes-textarea::placeholder {
+  color: #9CA3AF;
+}
+
+/* Panel Footer/Actions */
+.panel-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  background: #F9FAFB;
+  border-top: 2px solid #E5E7EB;
+  border-radius: 0 0 12px 12px;
+}
+
+.panel-actions-left {
+  display: flex;
+  gap: 12px;
+}
+
+.panel-actions-right {
+  display: flex;
+  gap: 12px;
+}
+
+.panel-action-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-action-btn.primary {
+  background: linear-gradient(135deg, #008080 0%, #006666 100%);
+  color: #FFFFFF;
+}
+
+.panel-action-btn.primary:hover {
+  background: linear-gradient(135deg, #006666 0%, #004d4d 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 128, 128, 0.3);
+}
+
+.panel-action-btn.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.panel-action-btn.secondary {
+  background: #FFFFFF;
+  color: #008080;
+  border: 2px solid #008080;
+}
+
+.panel-action-btn.secondary:hover {
+  background: rgba(0, 128, 128, 0.05);
+}
+
+.panel-action-btn.ghost {
+  background: transparent;
+  color: #6B7280;
+}
+
+.panel-action-btn.ghost:hover {
+  background: #E5E7EB;
+  color: #1F2937;
+}
+
+/* Empty State for Tabs */
+.panel-empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #9CA3AF;
+}
+
+.panel-empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.panel-empty-state h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #6B7280;
+  margin: 0 0 8px 0;
+}
+
+.panel-empty-state p {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .kanban-board {
+    flex-wrap: wrap;
+  }
+
+  .kanban-column {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .project-management-page {
+    padding: 16px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 24px;
+  }
+
+  .kanban-column {
+    flex: 1 1 100%;
+  }
+
+  .panel-header {
+    padding: 16px;
+  }
+
+  .panel-content {
+    padding: 16px;
+  }
+
+  .panel-tabs {
+    padding: 0 16px;
+  }
+
+  .panel-tab {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-footer {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .panel-actions-left,
+  .panel-actions-right {
+    width: 100%;
+  }
+
+  .panel-action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}

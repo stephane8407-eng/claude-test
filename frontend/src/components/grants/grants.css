@@ -1,0 +1,1035 @@
+/* ============================================
+   SPV Treasure Map - Grant Components Styles
+   Phase E Week 2: Grant Application System
+
+   Brand Colors:
+   - Primary: #008080 (Teal)
+   - Secondary: #C8A2C8 (Lilac)
+   - Background: #FFFFFF, #F5F5F5
+   - Text: #1F2937 (primary), #6B7280 (muted)
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+:root {
+  --grant-primary: #008080;
+  --grant-primary-light: rgba(0, 128, 128, 0.1);
+  --grant-primary-border: rgba(0, 128, 128, 0.2);
+  --grant-secondary: #C8A2C8;
+  --grant-bg-white: #FFFFFF;
+  --grant-bg-light: #F5F5F5;
+  --grant-text-primary: #1F2937;
+  --grant-text-muted: #6B7280;
+  --grant-border: #E5E7EB;
+  --grant-radius-card: 12px;
+  --grant-radius-button: 8px;
+  --grant-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --grant-shadow-hover: 0 4px 12px rgba(0, 128, 128, 0.15);
+}
+
+/* ============================================
+   MODAL OVERLAY & CONTAINER
+   ============================================ */
+.grant-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 16px;
+  animation: fadeIn 200ms ease-out;
+}
+
+.grant-modal {
+  background: var(--grant-bg-white);
+  border-radius: var(--grant-radius-card);
+  width: 80vw;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 300ms ease-out;
+}
+
+.grant-modal-small {
+  max-width: 600px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   DRAWER (Slide from right)
+   ============================================ */
+.grant-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 60;
+  animation: fadeIn 200ms ease-out;
+}
+
+.grant-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 600px;
+  max-width: 100vw;
+  height: 100vh;
+  background: var(--grant-bg-white);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  z-index: 61;
+  overflow-y: auto;
+  animation: slideInRight 300ms ease-out;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* ============================================
+   MODAL HEADER
+   ============================================ */
+.grant-modal-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--grant-border);
+  background: var(--grant-bg-white);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.grant-modal-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--grant-text-primary);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.grant-modal-header .subtitle {
+  font-size: 16px;
+  color: var(--grant-text-muted);
+  margin: 0;
+}
+
+.grant-modal-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--grant-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.grant-modal-close:hover {
+  color: var(--grant-text-primary);
+}
+
+/* ============================================
+   MODAL CONTENT
+   ============================================ */
+.grant-modal-content {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.grant-match-count {
+  font-size: 16px;
+  color: var(--grant-text-muted);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grant-match-count span {
+  color: var(--grant-primary);
+  font-weight: 600;
+}
+
+/* ============================================
+   PROGRAM CARDS
+   ============================================ */
+.grant-programs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.grant-program-card {
+  background: var(--grant-bg-white);
+  border: 1px solid var(--grant-border);
+  border-radius: var(--grant-radius-card);
+  padding: 20px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.grant-program-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--grant-shadow-hover);
+  border-color: var(--grant-primary);
+}
+
+.grant-program-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.grant-program-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.grant-program-title {
+  flex: 1;
+}
+
+.grant-program-title h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--grant-text-primary);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.grant-program-title .organization {
+  font-size: 14px;
+  color: var(--grant-text-muted);
+  margin: 0;
+}
+
+.grant-program-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.grant-program-amount {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--grant-text-primary);
+}
+
+.grant-program-percentage {
+  font-size: 16px;
+  color: var(--grant-text-muted);
+}
+
+.grant-program-meta {
+  font-size: 14px;
+  color: var(--grant-text-muted);
+  margin-bottom: 16px;
+}
+
+.grant-program-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.grant-program-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   STATUS BADGES
+   ============================================ */
+.grant-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.grant-badge-eligible {
+  background: rgba(0, 128, 128, 0.1);
+  color: #008080;
+  border-color: rgba(0, 128, 128, 0.2);
+}
+
+.grant-badge-check {
+  background: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.grant-badge-rolling {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.grant-badge-annual {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563EB;
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.grant-badge-deadline {
+  background: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+/* Application Status Badges */
+.status-researching {
+  background: rgba(0, 128, 128, 0.1);
+  color: #008080;
+  border-color: rgba(0, 128, 128, 0.2);
+}
+
+.status-preparing {
+  background: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.status-submitted {
+  background: rgba(139, 92, 246, 0.1);
+  color: #7C3AED;
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.status-under_review {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563EB;
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.status-approved {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.status-rejected {
+  background: rgba(156, 163, 175, 0.1);
+  color: #6B7280;
+  border-color: rgba(156, 163, 175, 0.2);
+}
+
+.status-abandoned {
+  background: rgba(156, 163, 175, 0.1);
+  color: #6B7280;
+  border-color: rgba(156, 163, 175, 0.2);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.grant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--grant-radius-button);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.grant-btn-primary {
+  background: var(--grant-primary);
+  color: white;
+}
+
+.grant-btn-primary:hover {
+  background: #006666;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 128, 128, 0.3);
+}
+
+.grant-btn-secondary {
+  background: var(--grant-bg-white);
+  color: var(--grant-primary);
+  border: 1px solid var(--grant-primary);
+}
+
+.grant-btn-secondary:hover {
+  background: var(--grant-primary-light);
+}
+
+.grant-btn-ghost {
+  background: transparent;
+  color: var(--grant-text-muted);
+  padding: 8px 16px;
+}
+
+.grant-btn-ghost:hover {
+  color: var(--grant-text-primary);
+  background: var(--grant-bg-light);
+}
+
+.grant-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.grant-btn-small {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+/* ============================================
+   DRAWER CONTENT
+   ============================================ */
+.grant-drawer-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--grant-border);
+  position: sticky;
+  top: 0;
+  background: var(--grant-bg-white);
+  z-index: 10;
+}
+
+.grant-drawer-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--grant-text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 16px;
+  transition: color 0.2s ease;
+}
+
+.grant-drawer-back:hover {
+  color: var(--grant-primary);
+}
+
+.grant-drawer-content {
+  padding: 24px;
+}
+
+.grant-drawer-section {
+  margin-bottom: 32px;
+}
+
+.grant-drawer-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--grant-primary);
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grant-drawer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.grant-drawer-section li {
+  font-size: 16px;
+  color: var(--grant-text-primary);
+  padding: 8px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.grant-drawer-section li::before {
+  content: "•";
+  color: var(--grant-primary);
+}
+
+.grant-drawer-section p {
+  font-size: 16px;
+  color: var(--grant-text-primary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.grant-drawer-divider {
+  height: 1px;
+  background: var(--grant-border);
+  margin: 24px 0;
+}
+
+.grant-drawer-footer {
+  padding: 24px;
+  border-top: 1px solid var(--grant-border);
+  background: var(--grant-bg-light);
+  display: flex;
+  gap: 12px;
+  position: sticky;
+  bottom: 0;
+}
+
+/* Eligibility Checklist */
+.grant-eligibility-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 16px;
+}
+
+.grant-eligibility-item.met {
+  color: #059669;
+}
+
+.grant-eligibility-item.not-met {
+  color: #DC2626;
+}
+
+.grant-eligibility-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--grant-text-muted);
+}
+
+.grant-eligibility-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--grant-bg-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.grant-eligibility-bar-fill {
+  height: 100%;
+  background: var(--grant-primary);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Links */
+.grant-link {
+  color: var(--grant-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.grant-link:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   FORM STYLES
+   ============================================ */
+.grant-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.grant-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grant-form-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--grant-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grant-form-input,
+.grant-form-textarea {
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid var(--grant-border);
+  border-radius: var(--grant-radius-button);
+  background: var(--grant-bg-white);
+  color: var(--grant-text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.grant-form-input:focus,
+.grant-form-textarea:focus {
+  outline: none;
+  border-color: var(--grant-primary);
+  box-shadow: 0 0 0 3px var(--grant-primary-light);
+}
+
+.grant-form-textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.grant-form-error {
+  font-size: 14px;
+  color: #DC2626;
+  margin-top: 4px;
+}
+
+/* Radio Group */
+.grant-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.grant-radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--grant-border);
+  border-radius: var(--grant-radius-button);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.grant-radio-option:hover {
+  border-color: var(--grant-primary);
+  background: var(--grant-primary-light);
+}
+
+.grant-radio-option.selected {
+  border-color: var(--grant-primary);
+  background: var(--grant-primary-light);
+}
+
+.grant-radio-option input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  accent-color: var(--grant-primary);
+}
+
+.grant-radio-content {
+  flex: 1;
+}
+
+.grant-radio-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--grant-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grant-radio-description {
+  font-size: 14px;
+  color: var(--grant-text-muted);
+  margin-top: 4px;
+}
+
+/* ============================================
+   APPLICATION LIST
+   ============================================ */
+.grant-applications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.grant-applications-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--grant-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grant-applications-count {
+  font-size: 14px;
+  color: var(--grant-text-muted);
+  font-weight: 400;
+}
+
+.grant-applications-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 50px;
+}
+
+/* Scrollbar styling for applications list */
+.grant-applications-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.grant-applications-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.grant-applications-list::-webkit-scrollbar-thumb {
+  background: var(--grant-primary);
+  border-radius: 4px;
+}
+
+.grant-applications-list::-webkit-scrollbar-thumb:hover {
+  background: #006666;
+}
+
+.grant-application-card {
+  background: var(--grant-bg-white);
+  border: 1px solid var(--grant-border);
+  border-radius: var(--grant-radius-card);
+  padding: 20px;
+  transition: all 0.2s ease;
+  min-height: 80px;
+}
+
+.grant-application-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--grant-shadow-hover);
+  border-color: var(--grant-primary);
+}
+
+.grant-application-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.grant-application-program {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grant-application-program h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--grant-text-primary);
+  margin: 0;
+}
+
+.grant-application-amount {
+  font-size: 14px;
+  color: var(--grant-text-muted);
+}
+
+.grant-application-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.grant-application-meta-item {
+  font-size: 14px;
+  color: var(--grant-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grant-application-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* ============================================
+   TABS
+   ============================================ */
+.grant-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--grant-border);
+  margin-bottom: 24px;
+}
+
+.grant-tab {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--grant-text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: -1px;
+}
+
+.grant-tab:hover {
+  color: var(--grant-primary);
+}
+
+.grant-tab.active {
+  color: var(--grant-primary);
+  border-bottom-color: var(--grant-primary);
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.grant-empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--grant-text-muted);
+}
+
+.grant-empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.grant-empty-state h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--grant-text-primary);
+  margin: 0 0 8px 0;
+}
+
+.grant-empty-state p {
+  font-size: 16px;
+  margin: 0 0 24px 0;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+.grant-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: var(--grant-text-muted);
+}
+
+.grant-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--grant-border);
+  border-top-color: var(--grant-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   TOAST NOTIFICATION
+   ============================================ */
+.grant-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--grant-text-primary);
+  color: white;
+  padding: 16px 24px;
+  border-radius: var(--grant-radius-button);
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  animation: slideInUp 300ms ease-out;
+}
+
+.grant-toast-success {
+  background: #059669;
+}
+
+.grant-toast-error {
+  background: #DC2626;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   FILTERS & SORTING
+   ============================================ */
+.grant-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.grant-select {
+  padding: 8px 32px 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--grant-border);
+  border-radius: var(--grant-radius-button);
+  background: var(--grant-bg-white);
+  color: var(--grant-text-primary);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.grant-select:focus {
+  outline: none;
+  border-color: var(--grant-primary);
+}
+
+/* ============================================
+   KANBAN INTEGRATION BADGE
+   ============================================ */
+.grant-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--grant-primary-light);
+  color: var(--grant-primary);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 12px;
+  border: 1px solid var(--grant-primary-border);
+}
+
+.grant-count-badge.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.grant-count-badge .approved-dot {
+  width: 6px;
+  height: 6px;
+  background: #059669;
+  border-radius: 50%;
+}
+
+/* ============================================
+   MODAL FOOTER
+   ============================================ */
+.grant-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--grant-border);
+  background: var(--grant-bg-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 768px) {
+  .grant-modal {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+
+  .grant-drawer {
+    width: 100%;
+  }
+
+  .grant-program-details {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .grant-program-actions {
+    flex-direction: column;
+  }
+
+  .grant-btn {
+    width: 100%;
+  }
+
+  .grant-filters {
+    flex-direction: column;
+  }
+
+  .grant-select {
+    width: 100%;
+  }
+
+  .grant-modal-header,
+  .grant-modal-content,
+  .grant-drawer-header,
+  .grant-drawer-content {
+    padding: 16px;
+  }
+
+  .grant-applications-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grant-tabs {
+    overflow-x: auto;
+  }
+
+  .grant-tab {
+    padding: 12px 16px;
+    white-space: nowrap;
+  }
+}

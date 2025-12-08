@@ -1,0 +1,396 @@
+// frontend/src/components/ProjectKanban.jsx
+/**
+ * Phase E: Project Management Kanban Board
+ * 
+ * Displays village projects in 5 columns:
+ * Exploring | Planning | In Progress | Completed | Abandoned
+ * 
+ * Features:
+ * - Drag and drop between columns
+ * - Project cards with key info
+ * - Click card to see details
+ * - Color-coded by priority
+ */
+
+import React, { useState, useEffect } from 'react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+
+const STATUS_COLUMNS = [
+  { id: 'exploring', title: 'Exploring', emoji: '🔍', color: 'bg-gray-100' },
+  { id: 'planning', title: 'Planning', emoji: '📋', color: 'bg-blue-100' },
+  { id: 'in_progress', title: 'In Progress', emoji: '🚧', color: 'bg-yellow-100' },
+  { id: 'completed', title: 'Completed', emoji: '✅', color: 'bg-green-100' },
+  { id: 'abandoned', title: 'Abandoned', emoji: '🗑️', color: 'bg-red-100' }
+];
+
+const PRIORITY_COLORS = {
+  1: 'border-gray-300 bg-white',
+  2: 'border-blue-300 bg-blue-50',
+  3: 'border-yellow-300 bg-yellow-50',
+  4: 'border-orange-300 bg-orange-50',
+  5: 'border-red-300 bg-red-50'
+};
+
+const PRIORITY_LABELS = {
+  1: 'Low',
+  2: 'Medium-Low',
+  3: 'Medium',
+  4: 'Medium-High',
+  5: 'High'
+};
+
+export default function ProjectKanban({ villageSlug }) {
+  const [projects, setProjects] = useState([]);
+  const [byStatus, setByStatus] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [selectedProject, setSelectedProject] = useState(null);
+
+  // Load projects on mount
+  useEffect(() => {
+    loadProjects();
+  }, [villageSlug]);
+
+  const loadProjects = async () => {
+    try {
+      const response = await fetch(`/api/villages/${villageSlug}/projects`);
+      const data = await response.json();
+      
+      setProjects(data.projects);
+      setByStatus(data.by_status);
+      setLoading(false);
+    } catch (error) {
+      console.error('Failed to load projects:', error);
+      setLoading(false);
+    }
+  };
+
+  // Handle drag and drop
+  const onDragEnd = async (result) => {
+    const { source, destination, draggableId } = result;
+
+    // Dropped outside a column
+    if (!destination) return;
+
+    // No status change
+    if (source.droppableId === destination.droppableId) return;
+
+    const newStatus = destination.droppableId;
+    const projectId = parseInt(draggableId);
+
+    // Optimistically update UI
+    const updatedProjects = projects.map(p => 
+      p.id === projectId ? { ...p, status: newStatus } : p
+    );
+    setProjects(updatedProjects);
+
+    // Update grouped view
+    const newByStatus = { ...byStatus };
+    const project = byStatus[source.droppableId].find(p => p.id === projectId);
+    newByStatus[source.droppableId] = newByStatus[source.droppableId].filter(p => p.id !== projectId);
+    newByStatus[destination.droppableId] = [...newByStatus[destination.droppableId], { ...project, status: newStatus }];
+    setByStatus(newByStatus);
+
+    // API call to persist change
+    try {
+      await fetch(`/api/villages/${villageSlug}/projects/${projectId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+    } catch (error) {
+      console.error('Failed to update project status:', error);
+      // Reload to revert optimistic update
+      loadProjects();
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">Loading projects...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-full">
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="flex gap-4 overflow-x-auto pb-4">
+          {STATUS_COLUMNS.map(column => (
+            <div key={column.id} className="flex-shrink-0 w-80">
+              {/* Column Header */}
+              <div className={`${column.color} rounded-t-lg p-3 border-b-2 border-gray-300`}>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-gray-800">
+                    <span className="mr-2">{column.emoji}</span>
+                    {column.title}
+                  </h3>
+                  <span className="text-sm font-medium text-gray-600">
+                    {byStatus[column.id]?.length || 0}
+                  </span>
+                </div>
+              </div>
+
+              {/* Droppable Column */}
+              <Droppable droppableId={column.id}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className={`min-h-[400px] p-3 ${
+                      snapshot.isDraggingOver ? 'bg-blue-50' : 'bg-gray-50'
+                    } rounded-b-lg border-2 border-gray-200`}
+                  >
+                    {(byStatus[column.id] || []).map((project, index) => (
+                      <Draggable
+                        key={project.id}
+                        draggableId={project.id.toString()}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            onClick={() => setSelectedProject(project)}
+                            className={`mb-3 p-4 rounded-lg border-2 shadow-sm cursor-pointer transition-all hover:shadow-md ${
+                              PRIORITY_COLORS[project.priority] || PRIORITY_COLORS[3]
+                            } ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                          >
+                            {/* Project Title */}
+                            <h4 className="font-semibold text-gray-800 mb-2 line-clamp-2">
+                              {project.project_data.title}
+                            </h4>
+
+                            {/* Budget */}
+                            <div className="text-sm text-gray-600 mb-2">
+                              💰 €{project.budget_estimated_min?.toLocaleString()} - €{project.budget_estimated_max?.toLocaleString()}
+                            </div>
+
+                            {/* Timeline */}
+                            <div className="text-sm text-gray-600 mb-2">
+                              ⏱️ {project.timeline_months} months
+                            </div>
+
+                            {/* Priority Badge */}
+                            <div className="flex items-center justify-between mt-2">
+                              <span className={`text-xs px-2 py-1 rounded-full ${
+                                project.priority >= 4 
+                                  ? 'bg-red-200 text-red-800' 
+                                  : project.priority >= 3
+                                  ? 'bg-yellow-200 text-yellow-800'
+                                  : 'bg-gray-200 text-gray-800'
+                              }`}>
+                                ⭐ {PRIORITY_LABELS[project.priority]}
+                              </span>
+
+                              {/* Inspired by badge */}
+                              {project.project_data.inspired_by && (
+                                <span className="text-xs text-gray-500">
+                                  🏆 {project.project_data.inspired_by}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Tier badge */}
+                            <div className="mt-2">
+                              <span className={`text-xs px-2 py-1 rounded ${
+                                project.project_data.tier === 'breakthrough'
+                                  ? 'bg-purple-200 text-purple-800'
+                                  : project.project_data.tier === 'innovation'
+                                  ? 'bg-blue-200 text-blue-800'
+                                  : 'bg-green-200 text-green-800'
+                              }`}>
+                                {project.project_data.tier}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+
+                    {/* Empty state */}
+                    {(!byStatus[column.id] || byStatus[column.id].length === 0) && (
+                      <div className="text-center text-gray-400 py-8">
+                        No projects in {column.title.toLowerCase()}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </Droppable>
+            </div>
+          ))}
+        </div>
+      </DragDropContext>
+
+      {/* Project Detail Modal */}
+      {selectedProject && (
+        <ProjectDetailModal
+          project={selectedProject}
+          villageSlug={villageSlug}
+          onClose={() => setSelectedProject(null)}
+          onUpdate={loadProjects}
+        />
+      )}
+    </div>
+  );
+}
+
+// ============================================
+// PROJECT DETAIL MODAL
+// ============================================
+
+function ProjectDetailModal({ project, villageSlug, onClose, onUpdate }) {
+  const [notes, setNotes] = useState(project.notes || '');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await fetch(`/api/villages/${villageSlug}/projects/${project.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes })
+      });
+      onUpdate();
+      onClose();
+    } catch (error) {
+      console.error('Failed to save project:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {project.project_data.title}
+              </h2>
+              <div className="flex items-center gap-3">
+                <span className={`text-sm px-3 py-1 rounded-full ${
+                  project.status === 'completed' ? 'bg-green-200 text-green-800' :
+                  project.status === 'in_progress' ? 'bg-yellow-200 text-yellow-800' :
+                  project.status === 'planning' ? 'bg-blue-200 text-blue-800' :
+                  project.status === 'abandoned' ? 'bg-red-200 text-red-800' :
+                  'bg-gray-200 text-gray-800'
+                }`}>
+                  {project.status}
+                </span>
+                <span className="text-sm px-3 py-1 rounded bg-purple-200 text-purple-800">
+                  {project.project_data.tier}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          {/* Description */}
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
+            <p className="text-gray-700">{project.project_data.description}</p>
+          </div>
+
+          {/* Key Details */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">Budget</h4>
+              <p className="text-gray-700">
+                €{project.budget_estimated_min?.toLocaleString()} - €{project.budget_estimated_max?.toLocaleString()}
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">Timeline</h4>
+              <p className="text-gray-700">{project.timeline_months} months</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">Difficulty</h4>
+              <p className="text-gray-700">{project.project_data.difficulty}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">Priority</h4>
+              <p className="text-gray-700">⭐ {PRIORITY_LABELS[project.priority]}</p>
+            </div>
+          </div>
+
+          {/* Inspired By */}
+          {project.project_data.inspired_by && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">Inspired By</h3>
+              <p className="text-gray-700">🏆 {project.project_data.inspired_by}</p>
+            </div>
+          )}
+
+          {/* Funding Sources */}
+          {project.project_data.funding_sources && project.project_data.funding_sources.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">Funding Sources</h3>
+              <ul className="list-disc list-inside text-gray-700">
+                {project.project_data.funding_sources.map((source, i) => (
+                  <li key={i}>{source}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* First Steps */}
+          {project.next_steps && project.next_steps.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">Next Steps</h3>
+              <ul className="space-y-2">
+                {project.next_steps.map((step, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="text-blue-600">→</span>
+                    <span className="text-gray-700">{step}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Mayor's Notes */}
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Mayor's Notes</h3>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full p-3 border rounded-lg resize-none"
+              rows={4}
+              placeholder="Add notes about this project..."
+            />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="sticky bottom-0 bg-gray-50 border-t p-6 flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

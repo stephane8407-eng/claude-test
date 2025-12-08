@@ -25,7 +25,7 @@ class UsageEvent(Base):
     referrer = Column(String(500))  # Where did they come from?
 
     # Flexible data
-    metadata = Column(JSONB)  # Any additional event-specific data
+    event_metadata = Column(JSONB)  # Any additional event-specific data
 
     timestamp = Column(TIMESTAMP, server_default=func.now(), index=True)
 
@@ -44,6 +44,6 @@ class UsageEvent(Base):
             "ip_address_hash": self.ip_address_hash,
             "user_agent": self.user_agent,
             "referrer": self.referrer,
-            "metadata": self.metadata,
+            "event_metadata": self.event_metadata,
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
         }

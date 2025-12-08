@@ -85,7 +85,7 @@ from app.api.grants import router as grants_router
 app.include_router(battles_router)
 app.include_router(places_router)
 app.include_router(project_kanban_router)
-app.include_router(grants_router)
+
 
 if __name__ == "__main__":
     import uvicorn
