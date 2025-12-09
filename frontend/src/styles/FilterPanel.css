@@ -1,0 +1,22 @@
+.filter-panel { 
+  display: flex; 
+  gap: 1rem; 
+  padding: 1rem 2rem; 
+  background: white; 
+  border-bottom: 1px solid #e5e7eb;
+}
+.filter-group { display: flex; gap: 0.5rem; align-items: center; }
+.filter-group label { font-weight: 600; color: #374151; }
+.filter-group select {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+.battle-count { 
+  padding: 0.5rem 1rem; 
+  background: #f3f4f6; 
+  border-radius: 4px;
+  font-weight: 600;
+  color: #667eea;
+}

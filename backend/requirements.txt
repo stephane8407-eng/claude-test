@@ -13,8 +13,9 @@ geoalchemy2==0.14.3
 pydantic==2.5.3
 pydantic-settings==2.1.0
 
-# Authentication (for later)
+# Authentication
 python-jose[cryptography]==3.3.0
+bcrypt==4.1.2
 passlib[bcrypt]==1.7.4
 python-dotenv==1.0.0
 
@@ -31,3 +32,18 @@ fastapi-cors==0.0.6
 pytest==7.4.4
 pytest-asyncio==0.23.3
 httpx==0.26.0
+
+# Week 7: Security & File Upload
+bleach==6.1.0
+Pillow==12.0.0
+
+# Week 8: Monitoring & Rate Limiting
+sentry-sdk==1.40.0
+slowapi==0.1.9
+
+# Week 9: Cache
+redis==5.0.1
+
+# Week 10: QR Codes
+qrcode[pil]==8.2
+user-agents==2.2.0

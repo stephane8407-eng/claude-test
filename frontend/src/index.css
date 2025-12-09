@@ -1,7 +1,28 @@
+@import "tailwindcss";
+
+/* SPV Design System - MUST come before @source directives in Tailwind v4 */
+@import "./styles/design-system.css";
+
+/* Tell Tailwind v4 where to scan for classes */
+@source "../index.html";
+@source "./**/*.{js,jsx,ts,tsx}";
+
+/* Tailwind v4 theme customization via CSS */
+@theme {
+  /* Custom colors */
+  --color-primary: #008080;
+  --color-primary-hover: #006666;
+  --color-primary-light: #e6f3f3;
+  --color-secondary: #C8A2C8;
+  --color-secondary-hover: #b88fb8;
+  --color-secondary-light: #f5eef5;
+}
+
+/* Note: CSS custom properties from design-system.css are available globally.
+   Use them in Tailwind with arbitrary values: bg-[var(--color-primary)] */
+
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-family);
 }
 
 * {
@@ -12,8 +33,8 @@
 
 body {
   margin: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
 #root {

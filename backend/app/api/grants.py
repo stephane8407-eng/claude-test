@@ -1,28 +1,23 @@
 """
-Grant matching and application API
-Phase E Week 2: Grant Application System
+Phase E Week 2: Grant Application API Routes
 
-Endpoints:
-- POST /api/grants/projects/{id}/match - Get matching funding programs
-- GET /api/grants/applications - List applications (with project_id filter)
-- POST /api/grants/applications - Create new application
-- GET /api/grants/applications/{id} - Get application detail
-- PUT /api/grants/applications/{id} - Update application
-- DELETE /api/grants/applications/{id} - Delete application
-- POST /api/grants/applications/research - AI research assistant
-- POST /api/grants/applications/draft - AI application draft
+Provides endpoints for:
+- Matching projects to funding programs
+- Generating grant applications using Claude API
+- Managing grant application lifecycle
 """
-
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session, joinedload
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from typing import List, Optional
 from pydantic import BaseModel
-from typing import Optional, List
-from datetime import datetime
 
 from app.database import get_db
-from app.models.project import ProjectInstance, FundingProgram, GrantApplication
-from app.models.place import Place
-from app.services.claude_api import call_claude_api, build_research_prompt, build_draft_prompt
+from app.models.grant_application import GrantApplication
+from app.models.project_instance import ProjectInstance
+from app.models.funding_program import FundingProgram
+from app.models.village import Village
+from app.services.grant_matcher import GrantMatcher
+
 
 router = APIRouter(prefix="/api/grants", tags=["grants"])
 
@@ -31,525 +26,409 @@ router = APIRouter(prefix="/api/grants", tags=["grants"])
 # PYDANTIC SCHEMAS
 # ============================================
 
-class ApplicationCreate(BaseModel):
-    project_id: int
-    funding_program_id: int
-    status: Optional[str] = "draft"
-    notes: Optional[str] = None
-    amount_requested: Optional[int] = None
-    submitted_date: Optional[str] = None
-    documents: Optional[List[dict]] = None
+class MatchGrantsRequest(BaseModel):
+    """Request to match funding programs for a project"""
+    village_population: int
+    village_region: Optional[str] = None
+    limit: int = 10
+    min_score: int = 0
 
 
-class ApplicationUpdate(BaseModel):
+class GenerateApplicationRequest(BaseModel):
+    """Request to generate a grant application"""
+    program_id: int
+    village_name: str
+    village_population: int
+    village_region: Optional[str] = None
+    village_department: Optional[str] = None
+    maire_name: Optional[str] = None
+    additional_context: Optional[str] = None
+
+
+class UpdateApplicationRequest(BaseModel):
+    """Request to update a grant application"""
+    text: Optional[str] = None
     status: Optional[str] = None
     notes: Optional[str] = None
     amount_requested: Optional[int] = None
-    amount_approved: Optional[int] = None
-    submitted_date: Optional[str] = None
-    decision_date: Optional[str] = None
-    decision_notes: Optional[str] = None
-    documents: Optional[List[dict]] = None
 
 
-class AIResearchRequest(BaseModel):
-    project_id: int
-    funding_program_id: int
-
-
-class AIDraftRequest(BaseModel):
-    project_id: int
-    funding_program_id: int
-    research_notes: Optional[str] = None
+class RegenerateSectionRequest(BaseModel):
+    """Request to regenerate a section of an application"""
+    section_name: str
+    instructions: Optional[str] = None
 
 
 # ============================================
-# GRANT MATCHING
+# MATCH FUNDING PROGRAMS
 # ============================================
 
 @router.post("/projects/{project_id}/match")
-def match_programs(project_id: int, db: Session = Depends(get_db)):
-    """
-    Find funding programs that match a project.
-    Returns programs sorted by match score.
-    """
-    project = db.query(ProjectInstance).filter(ProjectInstance.id == project_id).first()
-    if not project:
-        raise HTTPException(404, "Project not found")
-
-    village = db.query(Place).filter(Place.id == project.village_id).first()
-
-    # Get all active funding programs
-    programs = db.query(FundingProgram).filter(
-        FundingProgram.is_active == True
-    ).all()
-
-    matches = []
-    for prog in programs:
-        # Calculate match score (simplified for now)
-        score = calculate_match_score(project, village, prog)
-
-        matches.append({
-            "program_id": prog.id,
-            "name": prog.name,
-            "organization": prog.organization,
-            "program_type": prog.program_type,
-            "level": getattr(prog, 'level', None),
-            "score": score,
-            "amount_min": prog.amount_min,
-            "amount_max": prog.amount_max,
-            "funding_percentage_min": prog.funding_percentage_min,
-            "funding_percentage_max": prog.funding_percentage_max,
-            "deadline_type": prog.deadline_type,
-            "deadline_date": prog.next_deadline.isoformat() if prog.next_deadline else None,
-            "eligible_themes": prog.eligible_themes,
-            "eligible_regions": prog.eligible_regions,
-            "eligible_population_bands": prog.eligible_population_bands,
-            "description": prog.description,
-            "website_url": prog.website_url,
-            "application_url": prog.application_url,
-            "requirements": prog.requirements,
-            "required_documents": prog.required_documents,
-            "tips": getattr(prog, 'tips', None),
-            "process_summary": getattr(prog, 'process_summary', None),
-            "typical_timeline_months": getattr(prog, 'typical_timeline_months', None)
-        })
-
-    # Sort by score and return top 15
-    sorted_matches = sorted(matches, key=lambda x: x['score'], reverse=True)
-    return {"matches": sorted_matches[:15]}
-
-
-def calculate_match_score(project, village, program):
-    """
-    Calculate how well a funding program matches a project.
-    Returns a score from 0-100.
-    """
-    score = 70  # Base score
-
-    # Budget match
-    project_budget = (project.budget_estimated_min or 0) + (project.budget_estimated_max or 0)
-    if project_budget > 0:
-        avg_budget = project_budget / 2
-        if program.amount_min and program.amount_max:
-            if program.amount_min <= avg_budget <= program.amount_max:
-                score += 10
-            elif avg_budget < program.amount_min:
-                score += 5  # Project might grow
-        elif program.amount_max and avg_budget <= program.amount_max:
-            score += 8
-
-    # Theme match (if themes are defined)
-    project_themes = project.project_data.get('themes', []) if project.project_data else []
-    program_themes = program.eligible_themes or []
-
-    if project_themes and program_themes:
-        theme_overlap = len(set(project_themes) & set(program_themes))
-        if theme_overlap > 0:
-            score += min(15, theme_overlap * 5)
-
-    # Higher funding percentage is better
-    if program.funding_percentage_max:
-        score += min(5, program.funding_percentage_max // 20)
-
-    return min(100, score)
-
-
-# ============================================
-# GRANT APPLICATIONS CRUD
-# ============================================
-
-@router.get("/applications")
-def list_applications(
-    project_id: Optional[int] = Query(None),
-    status: Optional[str] = Query(None),
+def match_funding_programs(
+    project_id: int,
+    request: MatchGrantsRequest,
     db: Session = Depends(get_db)
 ):
     """
-    List grant applications.
-    Can filter by project_id and/or status.
+    Find and rank matching funding programs for a project.
+    
+    Scoring based on:
+    - Population band match (30 pts)
+    - Theme overlap (30 pts)
+    - Budget compatibility (25 pts)
+    - Deadline type (15 pts)
     """
-    query = db.query(GrantApplication).options(
-        joinedload(GrantApplication.funding_program)
+    # Verify project exists
+    project = db.query(ProjectInstance).filter(ProjectInstance.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Projet non trouvé")
+
+    matches = GrantMatcher.match_programs(
+        db=db,
+        project_id=project_id,
+        village_population=request.village_population,
+        village_region=request.village_region,
+        limit=request.limit,
+        min_score=request.min_score
     )
 
-    if project_id:
-        query = query.filter(GrantApplication.project_id == project_id)
-
-    if status:
-        query = query.filter(GrantApplication.status == status)
-
-    applications = query.order_by(GrantApplication.created_at.desc()).all()
-
     return {
-        "applications": [
-            {
-                "id": app.id,
-                "project_id": app.project_id,
-                "funding_program_id": app.funding_program_id,
-                "status": app.status,
-                "notes": app.notes,
-                "amount_requested": app.amount_requested,
-                "amount_approved": app.amount_approved,
-                "submitted_date": app.submitted_date.isoformat() if app.submitted_date else None,
-                "decision_date": app.decision_date.isoformat() if app.decision_date else None,
-                "decision_notes": app.decision_notes,
-                "documents": app.documents,
-                "created_at": app.created_at.isoformat() if app.created_at else None,
-                "updated_at": app.updated_at.isoformat() if app.updated_at else None,
-                "funding_program": {
-                    "id": app.funding_program.id,
-                    "name": app.funding_program.name,
-                    "organization": app.funding_program.organization,
-                    "amount_min": app.funding_program.amount_min,
-                    "amount_max": app.funding_program.amount_max,
-                    "funding_percentage_max": app.funding_program.funding_percentage_max,
-                    "deadline_type": app.funding_program.deadline_type,
-                    "deadline_date": app.funding_program.next_deadline.isoformat() if app.funding_program.next_deadline else None,
-                    "required_documents": app.funding_program.required_documents,
-                    "typical_timeline_months": getattr(app.funding_program, 'typical_timeline_months', None)
-                } if app.funding_program else None
-            }
-            for app in applications
-        ]
+        "project_id": project_id,
+        "village_population": request.village_population,
+        "total_programs": db.query(FundingProgram).filter(FundingProgram.is_active == True).count(),
+        "matches_found": len(matches),
+        "matches": matches
     }
 
 
-@router.post("/applications")
-def create_application(
-    application: ApplicationCreate,
+@router.get("/projects/{project_id}/match/quick")
+def quick_match_funding_programs(
+    project_id: int,
+    population: int,
+    region: Optional[str] = None,
+    limit: int = 5,
     db: Session = Depends(get_db)
 ):
-    """Create a new grant application."""
-    # Verify project exists
-    project = db.query(ProjectInstance).filter(
-        ProjectInstance.id == application.project_id
-    ).first()
+    """Quick match endpoint with query parameters (for simpler frontend calls)"""
+    project = db.query(ProjectInstance).filter(ProjectInstance.id == project_id).first()
     if not project:
-        raise HTTPException(404, "Project not found")
+        raise HTTPException(status_code=404, detail="Projet non trouvé")
 
-    # Verify funding program exists
+    matches = GrantMatcher.match_programs(
+        db=db,
+        project_id=project_id,
+        village_population=population,
+        village_region=region,
+        limit=limit
+    )
+
+    return {"matches": matches}
+
+
+# ============================================
+# GENERATE APPLICATION
+# ============================================
+
+@router.post("/projects/{project_id}/generate")
+def generate_grant_application(
+    project_id: int,
+    request: GenerateApplicationRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Generate a complete French grant application using Claude API.
+    
+    Creates a professional administrative document including:
+    - Cover letter
+    - Commune presentation
+    - Detailed project description
+    - Budget breakdown
+    - Implementation timeline
+    """
+    # Verify project exists
+    project = db.query(ProjectInstance).filter(ProjectInstance.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Projet non trouvé")
+
+    # Verify program exists
+    program = db.query(FundingProgram).filter(FundingProgram.id == request.program_id).first()
+    if not program:
+        raise HTTPException(status_code=404, detail="Programme de financement non trouvé")
+
+    try:
+        from app.services.application_generator import ApplicationGenerator
+        generator = ApplicationGenerator()
+        
+        result = generator.generate_application(
+            db=db,
+            project_id=project_id,
+            program_id=request.program_id,
+            village_name=request.village_name,
+            village_population=request.village_population,
+            village_region=request.village_region,
+            village_department=request.village_department,
+            maire_name=request.maire_name,
+            additional_context=request.additional_context
+        )
+        
+        return {
+            "success": True,
+            "message": "Dossier de demande généré avec succès",
+            **result
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Erreur lors de la génération du dossier: {str(e)}"
+        )
+
+
+# ============================================
+# GET APPLICATION
+# ============================================
+
+@router.get("/applications/{application_id}")
+def get_grant_application(
+    application_id: int,
+    db: Session = Depends(get_db)
+):
+    """Get a grant application by ID"""
+    application = db.query(GrantApplication).filter(
+        GrantApplication.id == application_id
+    ).first()
+
+    if not application:
+        raise HTTPException(status_code=404, detail="Dossier non trouvé")
+
+    # Get related program info
     program = db.query(FundingProgram).filter(
         FundingProgram.id == application.funding_program_id
     ).first()
-    if not program:
-        raise HTTPException(404, "Funding program not found")
 
-    # Check if application already exists for this project/program combo
-    existing = db.query(GrantApplication).filter(
-        GrantApplication.project_id == application.project_id,
-        GrantApplication.funding_program_id == application.funding_program_id
+    # Get related project info
+    project = db.query(ProjectInstance).filter(
+        ProjectInstance.id == application.project_instance_id
     ).first()
-    if existing:
-        raise HTTPException(400, "Application already exists for this project and program")
-
-    # Parse submitted_date if provided
-    submitted_date = None
-    if application.submitted_date:
-        try:
-            submitted_date = datetime.fromisoformat(application.submitted_date.replace('Z', '+00:00'))
-        except ValueError:
-            pass
-
-    # Create application
-    new_app = GrantApplication(
-        project_id=application.project_id,
-        funding_program_id=application.funding_program_id,
-        status=application.status or "draft",
-        notes=application.notes,
-        amount_requested=application.amount_requested,
-        submitted_date=submitted_date,
-        documents=application.documents
-    )
-
-    db.add(new_app)
-    db.commit()
-    db.refresh(new_app)
 
     return {
-        "success": True,
-        "message": "Application created successfully",
-        "application": {
-            "id": new_app.id,
-            "project_id": new_app.project_id,
-            "funding_program_id": new_app.funding_program_id,
-            "status": new_app.status,
-            "created_at": new_app.created_at.isoformat() if new_app.created_at else None
-        }
+        "id": application.id,
+        "project_instance_id": application.project_instance_id,
+        "project_title": project.project_data.get('title') if project and project.project_data else None,
+        "funding_program_id": application.funding_program_id,
+        "program_name": program.name if program else None,
+        "program_provider": program.organization if program else None,
+        "text": application.generated_content,
+        "status": application.status,
+        "amount_requested": application.amount_requested,
+        "amount_approved": application.amount_approved,
+        "submitted_date": application.submitted_date.isoformat() if application.submitted_date else None,
+        "decision_date": application.decision_date.isoformat() if application.decision_date else None,
+        "decision_notes": application.decision_notes,
+        "notes": application.notes,
+        "documents": application.documents or [],
+        "created_at": application.created_at.isoformat() if application.created_at else None,
+        "updated_at": application.updated_at.isoformat() if application.updated_at else None
     }
 
 
-@router.get("/applications/{application_id}")
-def get_application(application_id: int, db: Session = Depends(get_db)):
-    """Get a specific grant application."""
-    app = db.query(GrantApplication).options(
-        joinedload(GrantApplication.funding_program),
-        joinedload(GrantApplication.project)
-    ).filter(GrantApplication.id == application_id).first()
-
-    if not app:
-        raise HTTPException(404, "Application not found")
-
-    return app.to_dict()
-
+# ============================================
+# UPDATE APPLICATION
+# ============================================
 
 @router.put("/applications/{application_id}")
-def update_application(
+def update_grant_application(
     application_id: int,
-    update: ApplicationUpdate,
+    request: UpdateApplicationRequest,
     db: Session = Depends(get_db)
 ):
-    """Update a grant application."""
-    app = db.query(GrantApplication).filter(
+    """Update a grant application (edit text, change status, add notes)"""
+    application = db.query(GrantApplication).filter(
         GrantApplication.id == application_id
     ).first()
 
-    if not app:
-        raise HTTPException(404, "Application not found")
+    if not application:
+        raise HTTPException(status_code=404, detail="Dossier non trouvé")
 
-    # Update fields if provided
-    if update.status is not None:
-        app.status = update.status
+    # Validate status if provided
+    if request.status:
+        if request.status not in GrantApplication.VALID_STATUSES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Statut invalide. Valeurs acceptées: {', '.join(GrantApplication.VALID_STATUSES)}"
+            )
+        application.status = request.status
 
-    if update.notes is not None:
-        app.notes = update.notes
+    if request.text is not None:
+        application.generated_content = request.text
 
-    if update.amount_requested is not None:
-        app.amount_requested = update.amount_requested
+    if request.notes is not None:
+        application.notes = request.notes
 
-    if update.amount_approved is not None:
-        app.amount_approved = update.amount_approved
-
-    if update.submitted_date is not None:
-        try:
-            app.submitted_date = datetime.fromisoformat(update.submitted_date.replace('Z', '+00:00'))
-        except ValueError:
-            pass
-
-    if update.decision_date is not None:
-        try:
-            app.decision_date = datetime.fromisoformat(update.decision_date.replace('Z', '+00:00'))
-        except ValueError:
-            pass
-
-    if update.decision_notes is not None:
-        app.decision_notes = update.decision_notes
-
-    if update.documents is not None:
-        app.documents = update.documents
-
-    app.updated_at = datetime.now()
+    if request.amount_requested is not None:
+        application.amount_requested = request.amount_requested
 
     db.commit()
-    db.refresh(app)
+    db.refresh(application)
 
     return {
         "success": True,
-        "message": "Application updated successfully",
-        "application": app.to_dict()
+        "message": "Dossier mis à jour",
+        "application_id": application.id,
+        "status": application.status
     }
 
+
+# ============================================
+# LIST APPLICATIONS FOR PROJECT
+# ============================================
+
+@router.get("/projects/{project_id}/applications")
+def list_project_applications(
+    project_id: int,
+    db: Session = Depends(get_db)
+):
+    """List all grant applications for a project"""
+    # Verify project exists
+    project = db.query(ProjectInstance).filter(ProjectInstance.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Projet non trouvé")
+
+    applications = db.query(GrantApplication).filter(
+        GrantApplication.project_instance_id == project_id
+    ).order_by(GrantApplication.created_at.desc()).all()
+
+    result = []
+    for app in applications:
+        program = db.query(FundingProgram).filter(
+            FundingProgram.id == app.funding_program_id
+        ).first()
+        
+        result.append({
+            'id': app.id,
+            'funding_program_id': app.funding_program_id,
+            'program_name': program.name if program else 'Programme inconnu',
+            'program_provider': program.organization if program else None,
+            'status': app.status,
+            'amount_requested': app.amount_requested,
+            'created_at': app.created_at.isoformat() if app.created_at else None
+        })
+
+    return {
+        'project_id': project_id,
+        'count': len(result),
+        'applications': result
+    }
+
+
+# ============================================
+# DELETE APPLICATION
+# ============================================
 
 @router.delete("/applications/{application_id}")
-def delete_application(application_id: int, db: Session = Depends(get_db)):
-    """Delete a grant application."""
-    app = db.query(GrantApplication).filter(
+def delete_grant_application(
+    application_id: int,
+    db: Session = Depends(get_db)
+):
+    """Delete a grant application (only if in draft status)"""
+    application = db.query(GrantApplication).filter(
         GrantApplication.id == application_id
     ).first()
 
-    if not app:
-        raise HTTPException(404, "Application not found")
+    if not application:
+        raise HTTPException(status_code=404, detail="Dossier non trouvé")
 
-    db.delete(app)
+    if application.status != 'draft':
+        raise HTTPException(
+            status_code=400,
+            detail="Seuls les dossiers en brouillon peuvent être supprimés"
+        )
+
+    db.delete(application)
     db.commit()
 
     return {
         "success": True,
-        "message": "Application deleted successfully"
+        "message": "Dossier supprimé"
     }
 
 
 # ============================================
-# FUNDING PROGRAMS (Read-only)
+# REGENERATE SECTION
 # ============================================
 
-@router.get("/funding-programs")
-def list_funding_programs(
-    active_only: bool = Query(True),
+@router.post("/applications/{application_id}/regenerate-section")
+def regenerate_application_section(
+    application_id: int,
+    request: RegenerateSectionRequest,
     db: Session = Depends(get_db)
 ):
-    """List all funding programs."""
-    query = db.query(FundingProgram)
+    """Regenerate a specific section of an application"""
+    application = db.query(GrantApplication).filter(
+        GrantApplication.id == application_id
+    ).first()
 
-    if active_only:
-        query = query.filter(FundingProgram.is_active == True)
+    if not application:
+        raise HTTPException(status_code=404, detail="Dossier non trouvé")
 
-    programs = query.order_by(FundingProgram.name).all()
+    try:
+        from app.services.application_generator import ApplicationGenerator
+        generator = ApplicationGenerator()
+        
+        result = generator.regenerate_section(
+            db=db,
+            application_id=application_id,
+            section_name=request.section_name,
+            instructions=request.instructions
+        )
+        
+        return {
+            "success": True,
+            "section": result['section'],
+            "new_content": result['new_content']
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erreur lors de la régénération: {str(e)}"
+        )
+
+
+# ============================================
+# FUNDING PROGRAMS STATS
+# ============================================
+
+@router.get("/programs/stats")
+def get_funding_programs_stats(db: Session = Depends(get_db)):
+    """Get statistics about available funding programs"""
+    programs = db.query(FundingProgram).filter(FundingProgram.is_active == True).all()
+
+    by_level = {}
+    by_deadline = {}
+    total_amount_min = 0
+    total_amount_max = 0
+
+    for p in programs:
+        level = p.level or 'Other'
+        by_level[level] = by_level.get(level, 0) + 1
+        
+        deadline = p.deadline_type or 'unknown'
+        by_deadline[deadline] = by_deadline.get(deadline, 0) + 1
+        
+        if p.amount_min:
+            total_amount_min += p.amount_min
+        if p.amount_max:
+            total_amount_max += p.amount_max
 
     return {
-        "programs": [prog.to_dict() for prog in programs],
-        "total": len(programs)
+        "total_programs": len(programs),
+        "by_level": by_level,
+        "by_deadline_type": by_deadline,
+        "funding_range": {
+            "min_total": total_amount_min,
+            "max_total": total_amount_max,
+            "average_min": total_amount_min // len(programs) if programs else 0,
+            "average_max": total_amount_max // len(programs) if programs else 0
+        }
     }
-
-
-@router.get("/funding-programs/{program_id}")
-def get_funding_program(program_id: int, db: Session = Depends(get_db)):
-    """Get a specific funding program."""
-    program = db.query(FundingProgram).filter(
-        FundingProgram.id == program_id
-    ).first()
-
-    if not program:
-        raise HTTPException(404, "Funding program not found")
-
-    return program.to_dict()
-
-
-# ============================================
-# AI-POWERED GRANT ASSISTANCE
-# ============================================
-
-@router.post("/applications/research")
-async def generate_research(
-    request: AIResearchRequest,
-    db: Session = Depends(get_db)
-):
-    """
-    Generate AI-powered research content for a grant application.
-    Used in the "Researching" stage to analyze eligibility and requirements.
-    """
-    # Get project details
-    project = db.query(ProjectInstance).options(
-        joinedload(ProjectInstance.place)
-    ).filter(ProjectInstance.id == request.project_id).first()
-
-    if not project:
-        raise HTTPException(404, "Project not found")
-
-    # Get funding program details
-    program = db.query(FundingProgram).filter(
-        FundingProgram.id == request.funding_program_id
-    ).first()
-
-    if not program:
-        raise HTTPException(404, "Funding program not found")
-
-    # Extract project data
-    project_data = project.project_data or {}
-    project_name = project_data.get('title') or project_data.get('name') or "Projet sans nom"
-    project_description = project_data.get('description') or project_data.get('narrative') or ""
-
-    # Get village info
-    village = project.place
-    village_name = village.name if village else "Village"
-    village_population = village.population if village else None
-    village_region = "Nouvelle-Aquitaine, Charente"
-
-    try:
-        # Build prompt
-        prompt = build_research_prompt(
-            village_name=village_name,
-            village_population=village_population,
-            village_region=village_region,
-            project_name=project_name,
-            project_description=project_description,
-            budget_min=project.budget_estimated_min,
-            budget_max=project.budget_estimated_max,
-            timeline_months=project.timeline_months,
-            program_name=program.name,
-            program_organization=program.organization,
-            amount_min=program.amount_min,
-            amount_max=program.amount_max,
-            funding_percentage_min=program.funding_percentage_min,
-            funding_percentage_max=program.funding_percentage_max,
-            requirements=program.requirements,
-            eligible_themes=program.eligible_themes,
-            eligible_population_bands=program.eligible_population_bands,
-            required_documents=program.required_documents
-        )
-
-        # Call Claude API
-        research_content = await call_claude_api(prompt)
-
-        return {
-            "success": True,
-            "research_content": research_content,
-            "project_name": project_name,
-            "program_name": program.name
-        }
-
-    except Exception as e:
-        raise HTTPException(500, f"AI generation failed: {str(e)}")
-
-
-@router.post("/applications/draft")
-async def generate_draft(
-    request: AIDraftRequest,
-    db: Session = Depends(get_db)
-):
-    """
-    Generate AI-powered application draft for a grant.
-    Used in the "Preparing" stage to draft the full application.
-    """
-    # Get project details
-    project = db.query(ProjectInstance).options(
-        joinedload(ProjectInstance.place)
-    ).filter(ProjectInstance.id == request.project_id).first()
-
-    if not project:
-        raise HTTPException(404, "Project not found")
-
-    # Get funding program details
-    program = db.query(FundingProgram).filter(
-        FundingProgram.id == request.funding_program_id
-    ).first()
-
-    if not program:
-        raise HTTPException(404, "Funding program not found")
-
-    # Extract project data
-    project_data = project.project_data or {}
-    project_name = project_data.get('title') or project_data.get('name') or "Projet sans nom"
-    project_description = project_data.get('description') or project_data.get('narrative') or ""
-
-    # Get village info
-    village = project.place
-    village_name = village.name if village else "Village"
-    village_population = village.population if village else None
-    village_region = "Nouvelle-Aquitaine, Charente"
-
-    try:
-        # Build prompt
-        prompt = build_draft_prompt(
-            village_name=village_name,
-            village_population=village_population,
-            village_region=village_region,
-            project_name=project_name,
-            project_description=project_description,
-            budget_min=project.budget_estimated_min,
-            budget_max=project.budget_estimated_max,
-            timeline_months=project.timeline_months,
-            program_name=program.name,
-            program_organization=program.organization,
-            amount_min=program.amount_min,
-            amount_max=program.amount_max,
-            funding_percentage_min=program.funding_percentage_min,
-            funding_percentage_max=program.funding_percentage_max,
-            requirements=program.requirements,
-            eligible_themes=program.eligible_themes,
-            required_documents=program.required_documents,
-            research_notes=request.research_notes
-        )
-
-        # Call Claude API
-        draft_content = await call_claude_api(prompt, max_tokens=6000)
-
-        return {
-            "success": True,
-            "draft_content": draft_content,
-            "project_name": project_name,
-            "program_name": program.name
-        }
-
-    except Exception as e:
-        raise HTTPException(500, f"AI generation failed: {str(e)}")

@@ -1,0 +1,118 @@
+/**
+ * PublicPlaceCard Styles
+ * Clean place cards for public village page
+ */
+
+.spv-place-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow var(--transition-normal);
+}
+
+.spv-place-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================================
+   IMAGE
+   ========================================================================== */
+
+.spv-place-card__image {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+  background-color: var(--color-background);
+}
+
+.spv-place-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spv-place-card__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--color-text-light);
+}
+
+.spv-place-card__placeholder svg {
+  width: 48px;
+  height: 48px;
+}
+
+/* ==========================================================================
+   CONTENT
+   ========================================================================== */
+
+.spv-place-card__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--spacing-4);
+}
+
+.spv-place-card__name {
+  margin: 0 0 var(--spacing-2) 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+
+.spv-place-card__description {
+  margin: 0 0 var(--spacing-3) 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+}
+
+/* ==========================================================================
+   TAGS
+   ========================================================================== */
+
+.spv-place-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+.spv-place-card__tag {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  background-color: var(--color-background);
+  border-radius: var(--radius-sm);
+}
+
+/* ==========================================================================
+   BUTTON
+   ========================================================================== */
+
+.spv-place-card__button {
+  display: inline-block;
+  margin-top: auto;
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: white;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-md);
+  text-align: center;
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+}
+
+.spv-place-card__button:hover {
+  background-color: var(--color-primary-hover);
+}

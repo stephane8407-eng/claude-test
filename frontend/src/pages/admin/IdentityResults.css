@@ -1,0 +1,208 @@
+/**
+ * IdentityResults Styles
+ * Clean admin UI for reviewing and editing generated identity
+ */
+
+.spv-results {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-6);
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.spv-results__header {
+  margin-bottom: var(--spacing-8);
+  text-align: center;
+}
+
+.spv-results__title {
+  margin: 0 0 var(--spacing-2) 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.spv-results__subtitle {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   SECTIONS
+   ========================================================================== */
+
+.spv-results__section {
+  margin-bottom: var(--spacing-8);
+  padding: var(--spacing-5);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.spv-results__section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+.spv-results__section-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.spv-results__section-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   TEXTAREA
+   ========================================================================== */
+
+.spv-results__textarea {
+  width: 100%;
+  padding: var(--spacing-3);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+
+.spv-results__textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.spv-results__textarea--large {
+  min-height: 150px;
+}
+
+.spv-results__char-count {
+  margin-top: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+/* ==========================================================================
+   THEMES GRID - 3-Tier System
+   ========================================================================== */
+
+.spv-results__themes-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .spv-results__themes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .spv-results__themes-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Ensure consistent card heights in grid */
+.spv-results__themes-grid > * {
+  height: 100%;
+}
+
+/* ==========================================================================
+   PROJECTS LIST
+   ========================================================================== */
+
+.spv-results__projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* ==========================================================================
+   ACTIONS
+   ========================================================================== */
+
+.spv-results__actions {
+  margin-top: var(--spacing-8);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.spv-results__error {
+  margin-bottom: var(--spacing-4);
+  padding: var(--spacing-3);
+  font-size: var(--font-size-base);
+  color: var(--color-error, #dc2626);
+  background-color: #fef2f2;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.spv-results__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-4);
+}
+
+.spv-results__btn {
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.spv-results__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spv-results__btn--primary {
+  color: white;
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.spv-results__btn--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.spv-results__btn--secondary {
+  color: var(--color-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-primary);
+}
+
+.spv-results__btn--secondary:hover:not(:disabled) {
+  background-color: var(--color-primary-light);
+}
+
+.spv-results__btn--ghost {
+  color: var(--color-text-muted);
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+}
+
+.spv-results__btn--ghost:hover:not(:disabled) {
+  color: var(--color-text);
+  background-color: var(--color-background);
+}

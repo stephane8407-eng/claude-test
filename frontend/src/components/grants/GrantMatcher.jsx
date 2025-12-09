@@ -92,7 +92,13 @@ export default function GrantMatcher({
     try {
       const response = await fetch(`/api/grants/projects/${project.id}/match`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          village_population: project.village_population || project.project_data?.village_population || 5000,
+          village_region: project.village_region || project.project_data?.village_region || null,
+          limit: 20,
+          min_score: 0
+        })
       });
 
       if (!response.ok) {
