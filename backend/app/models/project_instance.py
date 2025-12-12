@@ -59,7 +59,7 @@ class ProjectInstance(Base):
     # Relationships
     village = relationship("Village", backref="project_instances")
     identity = relationship("VillageIdentity", backref="project_instances")
-    grant_applications = relationship("GrantApplication", back_populates="project_instance", cascade="all, delete-orphan")
+    grant_applications = relationship("GrantApplication", back_populates="project", cascade="all, delete-orphan")
 
     # Valid status values
     VALID_STATUSES = ['exploring', 'planning', 'in_progress', 'completed', 'abandoned']

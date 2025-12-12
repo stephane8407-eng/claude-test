@@ -51,12 +51,37 @@ class UpdateApplicationRequest(BaseModel):
     status: Optional[str] = None
     notes: Optional[str] = None
     amount_requested: Optional[int] = None
+    ai_research: Optional[str] = None
+    ai_draft: Optional[str] = None
 
 
 class RegenerateSectionRequest(BaseModel):
     """Request to regenerate a section of an application"""
     section_name: str
     instructions: Optional[str] = None
+
+
+class AIResearchRequest(BaseModel):
+    """Request for AI-powered grant research"""
+    project_id: int
+    funding_program_id: int
+
+
+class AIDraftRequest(BaseModel):
+    """Request for AI-powered draft generation"""
+    project_id: int
+    funding_program_id: int
+    research_notes: Optional[str] = None
+
+
+class GrantApplicationCreate(BaseModel):
+    """Request to create a grant application"""
+    project_id: int
+    funding_program_id: int
+    status: str = "draft"
+    generated_content: Optional[str] = None
+    amount_requested: Optional[int] = None
+    notes: Optional[str] = None
 
 
 # ============================================
@@ -209,17 +234,19 @@ def get_grant_application(
 
     # Get related project info
     project = db.query(ProjectInstance).filter(
-        ProjectInstance.id == application.project_instance_id
+        ProjectInstance.id == application.project_id
     ).first()
 
     return {
         "id": application.id,
-        "project_instance_id": application.project_instance_id,
+        "project_id": application.project_id,
         "project_title": project.project_data.get('title') if project and project.project_data else None,
         "funding_program_id": application.funding_program_id,
         "program_name": program.name if program else None,
         "program_provider": program.organization if program else None,
         "text": application.generated_content,
+        "ai_research": application.ai_research,
+        "ai_draft": application.ai_draft,
         "status": application.status,
         "amount_requested": application.amount_requested,
         "amount_approved": application.amount_approved,
@@ -269,6 +296,12 @@ def update_grant_application(
     if request.amount_requested is not None:
         application.amount_requested = request.amount_requested
 
+    if request.ai_research is not None:
+        application.ai_research = request.ai_research
+
+    if request.ai_draft is not None:
+        application.ai_draft = request.ai_draft
+
     db.commit()
     db.refresh(application)
 
@@ -296,7 +329,7 @@ def list_project_applications(
         raise HTTPException(status_code=404, detail="Projet non trouvé")
 
     applications = db.query(GrantApplication).filter(
-        GrantApplication.project_instance_id == project_id
+        GrantApplication.project_id == project_id
     ).order_by(GrantApplication.created_at.desc()).all()
 
     result = []
@@ -430,5 +463,296 @@ def get_funding_programs_stats(db: Session = Depends(get_db)):
             "max_total": total_amount_max,
             "average_min": total_amount_min // len(programs) if programs else 0,
             "average_max": total_amount_max // len(programs) if programs else 0
+        }
+    }
+
+
+# ============================================
+# AI RESEARCH & DRAFT GENERATION
+# ============================================
+
+@router.post("/applications/research")
+def generate_ai_research(
+    request: AIResearchRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Generate AI-powered research for a grant application.
+
+    Analyzes the project and funding program to produce:
+    - Eligibility assessment
+    - Key requirements summary
+    - Recommended approach
+    - Potential challenges
+
+    Also saves the generated content to the database (creates or updates application).
+
+    Note: This endpoint calls the Claude API and may take 3-10 seconds.
+    """
+    # Verify project exists
+    project = db.query(ProjectInstance).filter(ProjectInstance.id == request.project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Projet non trouvé")
+
+    # Verify program exists
+    program = db.query(FundingProgram).filter(FundingProgram.id == request.funding_program_id).first()
+    if not program:
+        raise HTTPException(status_code=404, detail="Programme de financement non trouvé")
+
+    try:
+        from app.services.application_generator import ApplicationGenerator
+        generator = ApplicationGenerator()
+
+        result = generator.research_eligibility(
+            db=db,
+            project_id=request.project_id,
+            program_id=request.funding_program_id
+        )
+
+        # Find or create application record to save the research
+        application = db.query(GrantApplication).filter(
+            GrantApplication.project_id == request.project_id,
+            GrantApplication.funding_program_id == request.funding_program_id
+        ).first()
+
+        if application:
+            # Update existing application
+            application.ai_research = result['research_content']
+        else:
+            # Create new application with the research
+            application = GrantApplication(
+                project_id=request.project_id,
+                funding_program_id=request.funding_program_id,
+                status='draft',
+                ai_research=result['research_content']
+            )
+            db.add(application)
+
+        db.commit()
+        db.refresh(application)
+
+        return {
+            "success": True,
+            "research_content": result['research_content'],
+            "project_id": result['project_id'],
+            "funding_program_id": result['program_id'],
+            "project_title": result['project_title'],
+            "program_name": result['program_name'],
+            "application_id": application.id
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erreur lors de l'analyse d'éligibilité: {str(e)}"
+        )
+
+
+@router.post("/applications/draft")
+def generate_ai_draft(
+    request: AIDraftRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Generate an AI-powered draft for a grant application.
+
+    Creates a structured application draft based on:
+    - Project information
+    - Funding program requirements
+    - Optional research notes
+
+    Also saves the generated content to the database (creates or updates application).
+
+    Note: This endpoint calls the Claude API and may take 5-15 seconds.
+    """
+    # Verify project exists
+    project = db.query(ProjectInstance).filter(ProjectInstance.id == request.project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Projet non trouvé")
+
+    # Verify program exists
+    program = db.query(FundingProgram).filter(FundingProgram.id == request.funding_program_id).first()
+    if not program:
+        raise HTTPException(status_code=404, detail="Programme de financement non trouvé")
+
+    try:
+        from app.services.application_generator import ApplicationGenerator
+        generator = ApplicationGenerator()
+
+        result = generator.generate_draft(
+            db=db,
+            project_id=request.project_id,
+            program_id=request.funding_program_id,
+            research_notes=request.research_notes
+        )
+
+        # Find or create application record to save the draft
+        application = db.query(GrantApplication).filter(
+            GrantApplication.project_id == request.project_id,
+            GrantApplication.funding_program_id == request.funding_program_id
+        ).first()
+
+        if application:
+            # Update existing application
+            application.ai_draft = result['draft_content']
+            application.status = 'preparing'  # Move to preparing status
+            if result.get('amount_requested'):
+                application.amount_requested = result['amount_requested']
+        else:
+            # Create new application with the draft
+            application = GrantApplication(
+                project_id=request.project_id,
+                funding_program_id=request.funding_program_id,
+                status='preparing',
+                ai_draft=result['draft_content'],
+                amount_requested=result.get('amount_requested')
+            )
+            db.add(application)
+
+        db.commit()
+        db.refresh(application)
+
+        return {
+            "success": True,
+            "draft_content": result['draft_content'],
+            "project_id": result['project_id'],
+            "funding_program_id": result['program_id'],
+            "project_title": result['project_title'],
+            "program_name": result['program_name'],
+            "amount_requested": result['amount_requested'],
+            "application_id": application.id
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erreur lors de la génération du brouillon: {str(e)}"
+        )
+
+
+# ============================================
+# LIST ALL APPLICATIONS
+# ============================================
+
+@router.get("/applications")
+def list_all_grant_applications(
+    project_id: Optional[int] = None,
+    status: Optional[str] = None,
+    limit: int = 50,
+    db: Session = Depends(get_db)
+):
+    """
+    List grant applications with optional filters.
+
+    Query params:
+    - project_id: Filter by project
+    - status: Filter by status (draft, submitted, etc.)
+    - limit: Max results (default 50)
+    """
+    query = db.query(GrantApplication)
+
+    if project_id:
+        query = query.filter(GrantApplication.project_id == project_id)
+
+    if status:
+        query = query.filter(GrantApplication.status == status)
+
+    applications = query.order_by(GrantApplication.created_at.desc()).limit(limit).all()
+
+    result = []
+    for app in applications:
+        program = db.query(FundingProgram).filter(
+            FundingProgram.id == app.funding_program_id
+        ).first()
+
+        project = db.query(ProjectInstance).filter(
+            ProjectInstance.id == app.project_id
+        ).first()
+
+        result.append({
+            'id': app.id,
+            'project_id': app.project_id,
+            'project_title': project.project_data.get('title') if project and project.project_data else None,
+            'funding_program_id': app.funding_program_id,
+            'program_name': program.name if program else 'Programme inconnu',
+            'program_organization': program.organization if program else None,
+            'status': app.status,
+            'amount_requested': app.amount_requested,
+            'amount_approved': app.amount_approved,
+            'submitted_date': app.submitted_date.isoformat() if app.submitted_date else None,
+            'created_at': app.created_at.isoformat() if app.created_at else None,
+            'updated_at': app.updated_at.isoformat() if app.updated_at else None
+        })
+
+    return {
+        'count': len(result),
+        'applications': result
+    }
+
+
+# ============================================
+# CREATE APPLICATION
+# ============================================
+
+@router.post("/applications", status_code=201)
+def create_grant_application(
+    request: GrantApplicationCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new grant application.
+
+    The application starts in 'draft' status by default.
+    """
+    # Verify project exists
+    project = db.query(ProjectInstance).filter(
+        ProjectInstance.id == request.project_id
+    ).first()
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Projet non trouvé")
+
+    # Verify program exists
+    program = db.query(FundingProgram).filter(
+        FundingProgram.id == request.funding_program_id
+    ).first()
+
+    if not program:
+        raise HTTPException(status_code=404, detail="Programme de financement non trouvé")
+
+    # Validate status
+    if request.status and request.status not in GrantApplication.VALID_STATUSES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Statut invalide. Valeurs acceptées: {', '.join(GrantApplication.VALID_STATUSES)}"
+        )
+
+    # Create application
+    application = GrantApplication(
+        project_id=request.project_id,
+        funding_program_id=request.funding_program_id,
+        status=request.status or 'draft',
+        generated_content=request.generated_content,
+        amount_requested=request.amount_requested,
+        notes=request.notes
+    )
+
+    db.add(application)
+    db.commit()
+    db.refresh(application)
+
+    return {
+        "success": True,
+        "message": "Dossier créé avec succès",
+        "application": {
+            "id": application.id,
+            "project_id": application.project_id,
+            "funding_program_id": application.funding_program_id,
+            "program_name": program.name,
+            "status": application.status,
+            "amount_requested": application.amount_requested,
+            "created_at": application.created_at.isoformat() if application.created_at else None
         }
     }

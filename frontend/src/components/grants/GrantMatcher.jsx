@@ -50,16 +50,16 @@ function formatAmount(min, max) {
   if (min && max) {
     return `${formatNum(min)} - ${formatNum(max)}`;
   }
-  if (max) return `Up to ${formatNum(max)}`;
-  if (min) return `From ${formatNum(min)}`;
-  return 'Amount varies';
+  if (max) return `Jusqu'à ${formatNum(max)}`;
+  if (min) return `À partir de ${formatNum(min)}`;
+  return 'Montant variable';
 }
 
 function formatPercentage(min, max) {
   if (min && max && min !== max) {
     return `${min}% - ${max}%`;
   }
-  if (max) return `Up to ${max}%`;
+  if (max) return `Jusqu'à ${max}%`;
   if (min) return `${min}%+`;
   return null;
 }
@@ -102,7 +102,7 @@ export default function GrantMatcher({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch matching programs');
+        throw new Error('Échec du chargement des programmes correspondants');
       }
 
       const data = await response.json();
@@ -184,7 +184,7 @@ export default function GrantMatcher({
 
   if (!isOpen) return null;
 
-  const projectTitle = project?.project_data?.title || 'Untitled Project';
+  const projectTitle = project?.project_data?.title || 'Projet sans titre';
 
   return (
     <>
@@ -202,7 +202,7 @@ export default function GrantMatcher({
           {/* Header */}
           <div className="grant-modal-header">
             <h2 id="grant-matcher-title">
-              💰 Funding Opportunities
+              💰 Opportunités de financement
             </h2>
             <p className="subtitle">{projectTitle}</p>
             <button
@@ -219,32 +219,32 @@ export default function GrantMatcher({
             {loading ? (
               <div className="grant-loading">
                 <div className="grant-loading-spinner" />
-                Finding matching programs...
+                Recherche des programmes correspondants...
               </div>
             ) : error ? (
               <div className="grant-empty-state">
                 <div className="grant-empty-state-icon">⚠️</div>
-                <h4>Unable to load programs</h4>
+                <h4>Impossible de charger les programmes</h4>
                 <p>{error}</p>
                 <button className="grant-btn grant-btn-primary" onClick={fetchMatches}>
-                  Try Again
+                  Réessayer
                 </button>
               </div>
             ) : filteredPrograms.length === 0 ? (
               <div className="grant-empty-state">
                 <div className="grant-empty-state-icon">🔍</div>
-                <h4>No matching programs found</h4>
+                <h4>Aucun programme correspondant trouvé</h4>
                 <p>
                   {filter !== 'all'
-                    ? 'Try changing your filter to see more programs.'
-                    : "We're continuously adding new programs. Check back soon!"}
+                    ? 'Essayez de modifier votre filtre pour voir plus de programmes.'
+                    : "Nous ajoutons continuellement de nouveaux programmes. Revenez bientôt !"}
                 </p>
                 {filter !== 'all' && (
                   <button
                     className="grant-btn grant-btn-secondary"
                     onClick={() => setFilter('all')}
                   >
-                    Show All Programs
+                    Afficher tous les programmes
                   </button>
                 )}
               </div>
@@ -252,7 +252,7 @@ export default function GrantMatcher({
               <>
                 {/* Match count and filters */}
                 <div className="grant-match-count">
-                  <span>✨ {filteredPrograms.length}</span> programs may help fund your project
+                  <span>✨ {filteredPrograms.length}</span> programmes peuvent aider à financer votre projet
                 </div>
 
                 <div className="grant-filters">
@@ -260,24 +260,24 @@ export default function GrantMatcher({
                     className="grant-select"
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
-                    aria-label="Filter programs"
+                    aria-label="Filtrer les programmes"
                   >
-                    <option value="all">All Programs</option>
-                    <option value="eu">EU Programs</option>
-                    <option value="national">National Programs</option>
-                    <option value="regional">Regional Programs</option>
+                    <option value="all">Tous les programmes</option>
+                    <option value="eu">Programmes européens</option>
+                    <option value="national">Programmes nationaux</option>
+                    <option value="regional">Programmes régionaux</option>
                   </select>
 
                   <select
                     className="grant-select"
                     value={sort}
                     onChange={(e) => setSort(e.target.value)}
-                    aria-label="Sort programs"
+                    aria-label="Trier les programmes"
                   >
-                    <option value="best">Best Match</option>
-                    <option value="amount">Highest Amount</option>
-                    <option value="deadline">Deadline Soon</option>
-                    <option value="alpha">Alphabetical</option>
+                    <option value="best">Meilleure correspondance</option>
+                    <option value="amount">Montant le plus élevé</option>
+                    <option value="deadline">Date limite proche</option>
+                    <option value="alpha">Alphabétique</option>
                   </select>
                 </div>
 
@@ -322,13 +322,13 @@ export default function GrantMatcher({
                           className="grant-btn grant-btn-secondary grant-btn-small"
                           onClick={() => setSelectedProgram(program)}
                         >
-                          Learn More
+                          En savoir plus
                         </button>
                         <button
                           className="grant-btn grant-btn-primary grant-btn-small"
                           onClick={() => setApplicationProgram(program)}
                         >
-                          Start Application
+                          Démarrer le dossier
                         </button>
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export default function GrantMatcher({
                       className="grant-btn grant-btn-ghost"
                       onClick={() => setShowAll(true)}
                     >
-                      Show {filteredPrograms.length - 5} more programs...
+                      Afficher {filteredPrograms.length - 5} programmes supplémentaires...
                     </button>
                   </div>
                 )}
@@ -353,7 +353,7 @@ export default function GrantMatcher({
                       className="grant-btn grant-btn-ghost"
                       onClick={() => setShowAll(false)}
                     >
-                      Show less
+                      Afficher moins
                     </button>
                   </div>
                 )}

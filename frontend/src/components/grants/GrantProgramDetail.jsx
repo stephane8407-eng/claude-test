@@ -40,43 +40,43 @@ function formatAmountRange(min, max) {
   const maxStr = formatAmount(max);
 
   if (minStr && maxStr) return `${minStr} - ${maxStr}`;
-  if (maxStr) return `Up to ${maxStr}`;
-  if (minStr) return `From ${minStr}`;
-  return 'Amount varies';
+  if (maxStr) return `Jusqu'à ${maxStr}`;
+  if (minStr) return `À partir de ${minStr}`;
+  return 'Montant variable';
 }
 
 function formatPercentageRange(min, max) {
   if (min && max && min !== max) return `${min}% - ${max}%`;
-  if (max) return `Up to ${max}%`;
+  if (max) return `Jusqu'à ${max}%`;
   if (min) return `${min}%+`;
   return null;
 }
 
 function getProgramType(program) {
   const org = (program.organization || '').toLowerCase();
-  if (org.includes('europ') || org.includes('commission')) return 'European Grant';
-  if (org.includes('ministère') || org.includes('état')) return 'National Grant';
-  if (org.includes('région')) return 'Regional Grant';
-  if (org.includes('fondation')) return 'Foundation Grant';
-  return program.program_type || 'Grant';
+  if (org.includes('europ') || org.includes('commission')) return 'Subvention européenne';
+  if (org.includes('ministère') || org.includes('état')) return 'Subvention nationale';
+  if (org.includes('région')) return 'Subvention régionale';
+  if (org.includes('fondation')) return 'Subvention fondation';
+  return program.program_type || 'Subvention';
 }
 
 function getDeadlineText(program) {
   if (program.deadline_type === 'rolling') {
-    return 'Rolling (apply anytime)';
+    return 'Candidature continue (à tout moment)';
   }
   if (program.deadline_type === 'annual') {
-    return 'Annual deadline';
+    return 'Date limite annuelle';
   }
   if (program.deadline_date || program.next_deadline) {
     const date = new Date(program.deadline_date || program.next_deadline);
-    return date.toLocaleDateString('en-GB', {
-      month: 'long',
+    return date.toLocaleDateString('fr-FR', {
       day: 'numeric',
+      month: 'long',
       year: 'numeric'
     });
   }
-  return 'Check with program';
+  return 'Vérifier auprès du programme';
 }
 
 export default function GrantProgramDetail({
@@ -102,21 +102,21 @@ export default function GrantProgramDetail({
   const eligibilityCriteria = [
     {
       name: 'Population',
-      description: program.eligible_population_bands?.[0] || '<10,000 habitants',
+      description: program.eligible_population_bands?.[0] || '<10 000 habitants',
       met: true
     },
     {
-      name: 'Region',
-      description: program.eligible_regions?.[0] || 'All regions',
+      name: 'Région',
+      description: program.eligible_regions?.[0] || 'Toutes les régions',
       met: true
     },
     {
-      name: 'Themes',
-      description: program.eligible_themes?.join(', ') || 'Heritage, Tourism, Rural Development',
+      name: 'Thèmes',
+      description: program.eligible_themes?.join(', ') || 'Patrimoine, Tourisme, Développement rural',
       met: true
     },
     {
-      name: 'Entity',
+      name: 'Entité',
       description: 'Commune',
       met: true
     }
@@ -136,7 +136,7 @@ export default function GrantProgramDetail({
 
   // Tips
   const tips = program.tips || program.process_summary ||
-    "Contact the program administrator early - they can guide you through the process. Multi-year projects often get higher funding percentages.";
+    "Contactez l'administrateur du programme tôt - il peut vous guider dans le processus. Les projets pluriannuels obtiennent souvent des taux de financement plus élevés.";
 
   return (
     <>
@@ -160,7 +160,7 @@ export default function GrantProgramDetail({
             className="grant-drawer-back"
             onClick={onClose}
           >
-            ← Back to Matches
+            ← Retour aux résultats
           </button>
 
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
@@ -192,26 +192,26 @@ export default function GrantProgramDetail({
         <div className="grant-drawer-content">
           {/* Funding Details */}
           <div className="grant-drawer-section">
-            <h3>💶 Funding Details</h3>
+            <h3>💶 Détails du financement</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li style={{ padding: '8px 0', display: 'flex', alignItems: 'flex-start' }}>
                 <span style={{ marginRight: '12px', color: '#008080' }}>•</span>
                 <span>
-                  <strong>Amount:</strong> {formatAmountRange(program.amount_min, program.amount_max)}
+                  <strong>Montant :</strong> {formatAmountRange(program.amount_min, program.amount_max)}
                 </span>
               </li>
               {formatPercentageRange(program.funding_percentage_min, program.funding_percentage_max) && (
                 <li style={{ padding: '8px 0', display: 'flex', alignItems: 'flex-start' }}>
                   <span style={{ marginRight: '12px', color: '#008080' }}>•</span>
                   <span>
-                    <strong>Coverage:</strong> {formatPercentageRange(program.funding_percentage_min, program.funding_percentage_max)} of project cost
+                    <strong>Couverture :</strong> {formatPercentageRange(program.funding_percentage_min, program.funding_percentage_max)} du coût du projet
                   </span>
                 </li>
               )}
               <li style={{ padding: '8px 0', display: 'flex', alignItems: 'flex-start' }}>
                 <span style={{ marginRight: '12px', color: '#008080' }}>•</span>
                 <span>
-                  <strong>Type:</strong> {getProgramType(program)}
+                  <strong>Type :</strong> {getProgramType(program)}
                 </span>
               </li>
             </ul>
@@ -222,14 +222,14 @@ export default function GrantProgramDetail({
           {/* Eligibility */}
           <div className="grant-drawer-section">
             <h3>
-              📋 Eligibility
+              📋 Éligibilité
               <span style={{
                 fontSize: '14px',
                 fontWeight: 400,
                 marginLeft: '12px',
                 color: eligibilityPercentage === 100 ? '#059669' : '#6B7280'
               }}>
-                ({metCount}/{eligibilityCriteria.length} criteria {eligibilityPercentage === 100 ? '✅' : ''})
+                ({metCount}/{eligibilityCriteria.length} critères {eligibilityPercentage === 100 ? '✅' : ''})
               </span>
             </h3>
 
@@ -262,19 +262,19 @@ export default function GrantProgramDetail({
 
           {/* Timeline */}
           <div className="grant-drawer-section">
-            <h3>📅 Timeline</h3>
+            <h3>📅 Calendrier</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li style={{ padding: '8px 0', display: 'flex', alignItems: 'flex-start' }}>
                 <span style={{ marginRight: '12px', color: '#008080' }}>•</span>
                 <span>
-                  <strong>Applications:</strong> {getDeadlineText(program)}
+                  <strong>Candidatures :</strong> {getDeadlineText(program)}
                 </span>
               </li>
               {program.typical_timeline_months && (
                 <li style={{ padding: '8px 0', display: 'flex', alignItems: 'flex-start' }}>
                   <span style={{ marginRight: '12px', color: '#008080' }}>•</span>
                   <span>
-                    <strong>Decision time:</strong> {program.typical_timeline_months} months typically
+                    <strong>Délai de décision :</strong> {program.typical_timeline_months} mois en moyenne
                   </span>
                 </li>
               )}
@@ -285,7 +285,7 @@ export default function GrantProgramDetail({
 
           {/* Requirements */}
           <div className="grant-drawer-section">
-            <h3>📚 Requirements</h3>
+            <h3>📚 Documents requis</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {(Array.isArray(requirements) ? requirements : [requirements]).map((req, index) => (
                 <li key={index} style={{ padding: '8px 0', display: 'flex', alignItems: 'flex-start' }}>
@@ -300,7 +300,7 @@ export default function GrantProgramDetail({
 
           {/* Tips */}
           <div className="grant-drawer-section">
-            <h3>💡 Insider Tips</h3>
+            <h3>💡 Conseils d'initié</h3>
             <p>{tips}</p>
           </div>
 
@@ -308,7 +308,7 @@ export default function GrantProgramDetail({
 
           {/* Links */}
           <div className="grant-drawer-section">
-            <h3>🔗 Links</h3>
+            <h3>🔗 Liens</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {program.website_url && (
                 <li style={{ padding: '8px 0' }}>
@@ -318,7 +318,7 @@ export default function GrantProgramDetail({
                     rel="noopener noreferrer"
                     className="grant-link"
                   >
-                    Official site →
+                    Site officiel →
                   </a>
                 </li>
               )}
@@ -330,13 +330,13 @@ export default function GrantProgramDetail({
                     rel="noopener noreferrer"
                     className="grant-link"
                   >
-                    Application portal →
+                    Portail de candidature →
                   </a>
                 </li>
               )}
               {!program.website_url && !program.application_url && (
                 <li style={{ padding: '8px 0', color: '#6B7280' }}>
-                  Links not available - check program name for official resources
+                  Liens non disponibles - recherchez le nom du programme pour les ressources officielles
                 </li>
               )}
             </ul>
@@ -350,14 +350,14 @@ export default function GrantProgramDetail({
             onClick={onStartApplication}
             style={{ flex: 1 }}
           >
-            ✨ Start Application
+            ✨ Démarrer le dossier
           </button>
           {onSaveForLater && (
             <button
               className="grant-btn grant-btn-secondary"
               onClick={onSaveForLater}
             >
-              📎 Save for Later
+              📎 Enregistrer pour plus tard
             </button>
           )}
         </div>

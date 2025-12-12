@@ -8,7 +8,8 @@ import { StatusBadge } from './StatusBadge';
 import './grants.css';
 
 function getProgramIcon(application) {
-  const org = (application.funding_program?.organization || '').toLowerCase();
+  // Support both flat (from API) and nested (legacy) formats
+  const org = (application.program_organization || application.funding_program?.organization || '').toLowerCase();
 
   if (org.includes('europ') || org.includes('commission')) return '🌿';
   if (org.includes('ministère') || org.includes('état')) return '🏛️';
@@ -29,17 +30,17 @@ function formatAmount(min, max) {
   const maxStr = formatNum(max);
 
   if (minStr && maxStr) return `${minStr} - ${maxStr}`;
-  if (maxStr) return `Up to ${maxStr}`;
-  if (minStr) return `From ${minStr}`;
+  if (maxStr) return `Jusqu'à ${maxStr}`;
+  if (minStr) return `À partir de ${minStr}`;
   return null;
 }
 
 function formatDate(dateString) {
   if (!dateString) return null;
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-GB', {
-    month: 'short',
+  return date.toLocaleDateString('fr-FR', {
     day: 'numeric',
+    month: 'short',
     year: 'numeric'
   });
 }
@@ -49,10 +50,12 @@ export default function GrantApplicationCard({
   onViewDetails,
   onUpdateStatus
 }) {
+  // Support both flat (from API) and nested (legacy) formats
   const program = application.funding_program || {};
+  const programName = application.program_name || program.name || 'Programme inconnu';
   const amountStr = formatAmount(program.amount_min, program.amount_max);
   const percentageStr = program.funding_percentage_max
-    ? `Up to ${program.funding_percentage_max}%`
+    ? `Jusqu'à ${program.funding_percentage_max}%`
     : null;
 
   // Calculate expected decision date for submitted applications
@@ -61,7 +64,7 @@ export default function GrantApplicationCard({
     const submittedDate = new Date(application.submitted_date);
     const monthsToAdd = program.typical_timeline_months || 6;
     submittedDate.setMonth(submittedDate.getMonth() + monthsToAdd);
-    return submittedDate.toLocaleDateString('en-GB', {
+    return submittedDate.toLocaleDateString('fr-FR', {
       month: 'short',
       year: 'numeric'
     });
@@ -83,7 +86,7 @@ export default function GrantApplicationCard({
         <div className="grant-application-program">
           <span style={{ fontSize: '20px' }}>{getProgramIcon(application)}</span>
           <div>
-            <h4>{program.name || 'Unknown Program'}</h4>
+            <h4>{programName}</h4>
             {amountStr && (
               <div className="grant-application-amount">
                 {amountStr}
@@ -101,12 +104,12 @@ export default function GrantApplicationCard({
           <>
             {application.submitted_date && (
               <div className="grant-application-meta-item">
-                📤 Submitted: {formatDate(application.submitted_date)}
+                📤 Soumis le : {formatDate(application.submitted_date)}
               </div>
             )}
             {expectedDecision && (
               <div className="grant-application-meta-item">
-                🗓️ Expected decision: {expectedDecision}
+                🗓️ Décision attendue : {expectedDecision}
               </div>
             )}
           </>
@@ -116,30 +119,30 @@ export default function GrantApplicationCard({
           <>
             {program.deadline_date && (
               <div className="grant-application-meta-item">
-                ⏰ Next deadline: {formatDate(program.deadline_date)}
+                ⏰ Prochaine date limite : {formatDate(program.deadline_date)}
               </div>
             )}
             <div className="grant-application-meta-item">
-              📎 Documents: {docProgress.completed}/{docProgress.required} complete
+              📎 Documents : {docProgress.completed}/{docProgress.required} complétés
             </div>
           </>
         )}
 
         {(application.status === 'draft' || application.status === 'researching') && (
           <div className="grant-application-meta-item">
-            🕐 Started: {formatDate(application.created_at)}
+            🕐 Commencé le : {formatDate(application.created_at)}
           </div>
         )}
 
         {application.status === 'approved' && application.amount_approved && (
           <div className="grant-application-meta-item" style={{ color: '#059669', fontWeight: 500 }}>
-            ✅ Approved: €{application.amount_approved.toLocaleString()}
+            ✅ Approuvé : {application.amount_approved.toLocaleString()} €
           </div>
         )}
 
         {application.status === 'rejected' && application.decision_notes && (
           <div className="grant-application-meta-item">
-            📝 Reason: {application.decision_notes}
+            📝 Motif : {application.decision_notes}
           </div>
         )}
       </div>
@@ -167,7 +170,7 @@ export default function GrantApplicationCard({
             className="grant-btn grant-btn-secondary grant-btn-small"
             onClick={() => onViewDetails(application)}
           >
-            View Details
+            Voir les détails
           </button>
         )}
         {onUpdateStatus && (
@@ -175,7 +178,7 @@ export default function GrantApplicationCard({
             className="grant-btn grant-btn-ghost grant-btn-small"
             onClick={() => onUpdateStatus(application)}
           >
-            Update Status
+            Modifier le statut
           </button>
         )}
       </div>

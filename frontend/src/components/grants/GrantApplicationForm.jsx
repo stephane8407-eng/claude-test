@@ -20,20 +20,20 @@ const STATUS_OPTIONS = [
   {
     value: 'draft',
     emoji: '🔍',
-    title: 'Researching',
-    description: 'Just exploring this funding option'
+    title: 'Recherche',
+    description: 'Exploration de cette option de financement'
   },
   {
     value: 'preparing',
     emoji: '📝',
-    title: 'Preparing',
-    description: 'Gathering documents and information'
+    title: 'Préparation',
+    description: 'Collecte des documents et informations'
   },
   {
     value: 'submitted',
     emoji: '📤',
-    title: 'Submitted',
-    description: 'Application has been sent'
+    title: 'Soumis',
+    description: 'Le dossier a été envoyé'
   }
 ];
 
@@ -55,6 +55,7 @@ export default function GrantApplicationForm({
   const [error, setError] = useState(null);
   const [showAutoSaved, setShowAutoSaved] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   // AI Generation states
   const [aiGenerating, setAiGenerating] = useState(false);
@@ -136,7 +137,7 @@ export default function GrantApplicationForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to generate research');
+        throw new Error(errorData.detail || 'Échec de la génération de l\'analyse');
       }
 
       const data = await response.json();
@@ -168,7 +169,7 @@ export default function GrantApplicationForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to generate draft');
+        throw new Error(errorData.detail || 'Échec de la génération du brouillon');
       }
 
       const data = await response.json();
@@ -186,7 +187,7 @@ export default function GrantApplicationForm({
     e.preventDefault();
 
     if (!status) {
-      setError('Please select a status');
+      setError('Veuillez sélectionner un statut');
       return;
     }
 
@@ -209,11 +210,16 @@ export default function GrantApplicationForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to create application');
+        throw new Error(errorData.detail || 'Échec de la création du dossier');
       }
 
       // Clear saved draft
       localStorage.removeItem(LOCAL_STORAGE_KEY);
+
+      // Show success message and clear any previous error
+      setError(null);
+      setSubmitting(false);
+      setSuccessMessage('Dossier créé avec succès !');
 
       // Check if this is the first application (show confetti)
       const existingApps = await fetch(`/api/grants/applications?project_id=${project.id}`);
@@ -224,9 +230,12 @@ export default function GrantApplicationForm({
         setTimeout(() => {
           setShowConfetti(false);
           onSuccess();
-        }, 2000);
+        }, 2500);
       } else {
-        onSuccess();
+        // Show success message for 1.5 seconds before closing
+        setTimeout(() => {
+          onSuccess();
+        }, 1500);
       }
     } catch (err) {
       setError(err.message);
@@ -237,7 +246,7 @@ export default function GrantApplicationForm({
   };
 
   const addDocumentLink = () => {
-    const url = prompt('Enter document URL (Google Drive, Dropbox, etc.):');
+    const url = prompt('Entrez l\'URL du document (Google Drive, Dropbox, etc.) :');
     if (url && url.trim()) {
       setDocuments([...documents, { type: 'link', url: url.trim(), name: url.trim() }]);
     }
@@ -247,7 +256,7 @@ export default function GrantApplicationForm({
     setDocuments(documents.filter((_, i) => i !== index));
   };
 
-  const projectTitle = project?.project_data?.title || 'Untitled Project';
+  const projectTitle = project?.project_data?.title || 'Projet sans titre';
 
   // Determine which AI button to show based on status
   const showResearchButton = status === 'draft';
@@ -268,7 +277,7 @@ export default function GrantApplicationForm({
         {/* Header */}
         <div className="grant-modal-header">
           <h2 id="application-form-title">
-            Start Grant Application
+            Démarrer le dossier de subvention
           </h2>
           {showAutoSaved && (
             <span style={{
@@ -278,7 +287,7 @@ export default function GrantApplicationForm({
               top: '24px',
               right: '60px'
             }}>
-              Auto-saved
+              Sauvegardé
             </span>
           )}
           <button
@@ -300,13 +309,13 @@ export default function GrantApplicationForm({
             marginBottom: '24px'
           }}>
             <div style={{ marginBottom: '8px' }}>
-              <span style={{ fontSize: '14px', color: '#6B7280' }}>Project:</span>
+              <span style={{ fontSize: '14px', color: '#6B7280' }}>Projet :</span>
               <div style={{ fontSize: '16px', fontWeight: 500, color: '#1F2937' }}>
                 {projectTitle}
               </div>
             </div>
             <div>
-              <span style={{ fontSize: '14px', color: '#6B7280' }}>Program:</span>
+              <span style={{ fontSize: '14px', color: '#6B7280' }}>Programme :</span>
               <div style={{ fontSize: '16px', fontWeight: 500, color: '#1F2937' }}>
                 {program.name}
               </div>
@@ -317,7 +326,7 @@ export default function GrantApplicationForm({
             {/* Status Selection */}
             <div className="grant-form-group">
               <label className="grant-form-label">
-                Current Status
+                Statut actuel
               </label>
               <div className="grant-radio-group">
                 {STATUS_OPTIONS.map(option => (
@@ -427,7 +436,7 @@ export default function GrantApplicationForm({
                 {status === 'submitted' && 'Notes de Suivi'}
                 {!['draft', 'preparing', 'submitted'].includes(status) && 'Notes'}
                 <span style={{ fontWeight: 400, color: '#6B7280', marginLeft: '8px' }}>
-                  (Optional)
+                  (Facultatif)
                 </span>
               </label>
 
@@ -490,7 +499,7 @@ export default function GrantApplicationForm({
                   <label className="grant-form-label" htmlFor="referenceNumber">
                     Numéro de Référence
                     <span style={{ fontWeight: 400, color: '#6B7280', marginLeft: '8px' }}>
-                      (Optional)
+                      (Facultatif)
                     </span>
                   </label>
                   <input
@@ -510,7 +519,7 @@ export default function GrantApplicationForm({
               <label className="grant-form-label">
                 Documents
                 <span style={{ fontWeight: 400, color: '#6B7280', marginLeft: '8px' }}>
-                  (Optional)
+                  (Facultatif)
                 </span>
               </label>
               {documents.length > 0 && (
@@ -564,13 +573,13 @@ export default function GrantApplicationForm({
                     className="grant-btn grant-btn-ghost grant-btn-small"
                     onClick={addDocumentLink}
                   >
-                    + Add Link
+                    + Ajouter un lien
                   </button>
                 </div>
               )}
               {documents.length >= 5 && (
                 <p style={{ fontSize: '14px', color: '#6B7280' }}>
-                  Maximum 5 documents reached
+                  Maximum 5 documents atteint
                 </p>
               )}
             </div>
@@ -581,7 +590,7 @@ export default function GrantApplicationForm({
                 <label className="grant-form-label">
                   Dates Clés
                   <span style={{ fontWeight: 400, color: '#6B7280', marginLeft: '8px' }}>
-                    (Optional)
+                    (Facultatif)
                   </span>
                 </label>
                 <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
@@ -619,6 +628,22 @@ export default function GrantApplicationForm({
                 {error}
               </div>
             )}
+
+            {/* Success Message */}
+            {successMessage && (
+              <div style={{
+                padding: '16px',
+                background: 'rgba(34, 197, 94, 0.1)',
+                border: '1px solid rgba(34, 197, 94, 0.3)',
+                borderRadius: '8px',
+                textAlign: 'center',
+                color: '#16a34a',
+                fontWeight: 500,
+                fontSize: '16px'
+              }}>
+                {successMessage}
+              </div>
+            )}
           </form>
         </div>
 
@@ -630,7 +655,7 @@ export default function GrantApplicationForm({
             onClick={onClose}
             disabled={submitting}
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
@@ -641,10 +666,10 @@ export default function GrantApplicationForm({
             {submitting ? (
               <>
                 <span className="grant-loading-spinner" style={{ width: '16px', height: '16px', marginRight: '8px' }} />
-                Creating...
+                Création...
               </>
             ) : (
-              'Create Application'
+              'Créer le dossier'
             )}
           </button>
         </div>
@@ -665,6 +690,35 @@ export default function GrantApplicationForm({
               animation: 'pulse 0.5s ease-in-out infinite'
             }}>
               🎉
+            </div>
+          </div>
+        )}
+
+        {/* Success overlay - prominent display */}
+        {successMessage && !showConfetti && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(255, 255, 255, 0.95)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 50,
+            borderRadius: '12px'
+          }}>
+            <div style={{
+              fontSize: '48px',
+              marginBottom: '16px'
+            }}>
+              ✅
+            </div>
+            <div style={{
+              fontSize: '18px',
+              fontWeight: 600,
+              color: '#16a34a'
+            }}>
+              {successMessage}
             </div>
           </div>
         )}

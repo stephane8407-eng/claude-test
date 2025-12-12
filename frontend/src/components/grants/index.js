@@ -8,4 +8,5 @@ export { default as GrantProgramDetail } from './GrantProgramDetail';
 export { default as GrantApplicationForm } from './GrantApplicationForm';
 export { default as GrantApplicationList } from './GrantApplicationList';
 export { default as GrantApplicationCard } from './GrantApplicationCard';
+export { default as GrantApplicationDetail } from './GrantApplicationDetail';
 export { StatusBadge, EligibilityBadge, DeadlineBadge, ProgramTypeBadge } from './StatusBadge';

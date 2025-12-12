@@ -89,7 +89,7 @@ class ApplicationGenerator:
 
         # Save to database
         application = GrantApplication(
-            project_instance_id=project_id,
+            project_id=project_id,
             funding_program_id=program_id,
             status='draft',
             generated_content=generated_text,
@@ -395,4 +395,279 @@ Retourne UNIQUEMENT la nouvelle version de cette section."""
         return {
             'section': section_name,
             'new_content': message.content[0].text
+        }
+
+    def research_eligibility(
+        self,
+        db: Session,
+        project_id: int,
+        program_id: int
+    ) -> Dict[str, Any]:
+        """
+        Generate AI-powered eligibility research for a grant application.
+
+        Analyzes the project against funding program requirements to produce:
+        - Eligibility assessment
+        - Key requirements summary
+        - Recommended approach
+        - Potential challenges
+        """
+        # Get project and program
+        project = db.query(ProjectInstance).filter(ProjectInstance.id == project_id).first()
+        program = db.query(FundingProgram).filter(FundingProgram.id == program_id).first()
+
+        if not project:
+            raise ValueError(f"Project {project_id} not found")
+        if not program:
+            raise ValueError(f"Funding program {program_id} not found")
+
+        # Extract project data
+        project_data = project.project_data or {}
+        project_title = project_data.get('title') or project_data.get('name') or 'Projet à définir'
+        project_description = project_data.get('description') or ''
+        project_themes = project_data.get('themes') or []
+        budget_min = project.budget_estimated_min or project_data.get('budget_min') or 0
+        budget_max = project.budget_estimated_max or project_data.get('budget_max') or 0
+        timeline = project.timeline_months or project_data.get('timeline_months') or 12
+
+        # Get village info if available
+        village = None
+        if project.village_id:
+            village = db.query(Village).filter(Village.id == project.village_id).first()
+
+        village_name = village.name if village else project_data.get('village_name', 'Commune')
+        village_population = village.population if village else project_data.get('village_population', 0)
+
+        prompt = f"""Tu es un expert en subventions publiques françaises pour les petites communes rurales.
+Analyse l'éligibilité de ce projet au programme de financement ci-dessous.
+
+═══════════════════════════════════════════════════════════════
+PROJET À ANALYSER
+═══════════════════════════════════════════════════════════════
+• Titre : {project_title}
+• Description : {project_description or "Non précisée"}
+• Thématiques : {', '.join(project_themes) if project_themes else "Non définies"}
+• Budget estimé : {budget_min:,}€ à {budget_max:,}€
+• Durée : {timeline} mois
+• Commune : {village_name} ({village_population:,} habitants)
+
+═══════════════════════════════════════════════════════════════
+PROGRAMME DE FINANCEMENT
+═══════════════════════════════════════════════════════════════
+• Nom : {program.name}
+• Organisme : {program.organization}
+• Niveau : {program.level or 'National'}
+• Montant finançable : {program.amount_min or 0:,}€ à {program.amount_max or 0:,}€
+• Taux de financement : {program.funding_percentage_min or '?'}% à {program.funding_percentage_max or '?'}%
+• Type d'appel : {program.deadline_type or 'Non précisé'}
+• Description : {program.description or 'Non précisée'}
+• Exigences : {program.requirements or 'Non précisées'}
+• Documents requis : {program.required_documents or 'Non précisés'}
+• Thématiques éligibles : {', '.join(program.eligible_themes) if program.eligible_themes else 'Non précisées'}
+• Populations éligibles : {', '.join(program.eligible_population_bands) if program.eligible_population_bands else 'Toutes'}
+
+═══════════════════════════════════════════════════════════════
+MISSION
+═══════════════════════════════════════════════════════════════
+Produis une analyse d'éligibilité DÉTAILLÉE et PROFESSIONNELLE en français.
+
+STRUCTURE OBLIGATOIRE :
+
+## 1. Score d'éligibilité
+Donne un score de 0 à 100% et justifie-le.
+
+## 2. Points forts du dossier
+Liste les éléments qui jouent en faveur de la candidature.
+
+## 3. Points de vigilance
+Liste les risques ou faiblesses potentiels.
+
+## 4. Analyse des critères
+Pour chaque critère du programme, indique si le projet répond :
+- ✅ Critère rempli
+- ⚠️ Critère partiellement rempli
+- ❌ Critère non rempli
+
+## 5. Recommandations stratégiques
+Conseils pour maximiser les chances de succès.
+
+## 6. Documents à préparer
+Liste priorisée des pièces à rassembler.
+
+## 7. Prochaines étapes
+Actions concrètes à mener dans l'ordre.
+
+Sois précis, factuel et utile. Ne survends pas si l'éligibilité est faible."""
+
+        # Call Claude API
+        message = self.client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=4000,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        return {
+            'research_content': message.content[0].text,
+            'project_id': project_id,
+            'program_id': program_id,
+            'project_title': project_title,
+            'program_name': program.name
+        }
+
+    def generate_draft(
+        self,
+        db: Session,
+        project_id: int,
+        program_id: int,
+        research_notes: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Generate an AI-powered draft for a grant application.
+
+        Creates a structured, professional application draft based on:
+        - Project information
+        - Funding program requirements
+        - Optional research notes from previous analysis
+        """
+        # Get project and program
+        project = db.query(ProjectInstance).filter(ProjectInstance.id == project_id).first()
+        program = db.query(FundingProgram).filter(FundingProgram.id == program_id).first()
+
+        if not project:
+            raise ValueError(f"Project {project_id} not found")
+        if not program:
+            raise ValueError(f"Funding program {program_id} not found")
+
+        # Extract project data
+        project_data = project.project_data or {}
+        project_title = project_data.get('title') or project_data.get('name') or 'Projet à définir'
+        project_description = project_data.get('description') or ''
+        project_themes = project_data.get('themes') or []
+        first_steps = project_data.get('first_steps') or project_data.get('firstSteps') or []
+        budget_min = project.budget_estimated_min or project_data.get('budget_min') or 0
+        budget_max = project.budget_estimated_max or project_data.get('budget_max') or 0
+        timeline = project.timeline_months or project_data.get('timeline_months') or 12
+
+        # Get village info
+        village = None
+        if project.village_id:
+            village = db.query(Village).filter(Village.id == project.village_id).first()
+
+        village_name = village.name if village else project_data.get('village_name', '[Commune]')
+        village_population = village.population if village else project_data.get('village_population', 0)
+        village_region = village.region if village else project_data.get('village_region', '')
+
+        # Calculate funding amount
+        average_budget = (budget_min + budget_max) // 2 if budget_min or budget_max else 0
+        funding_pct = program.funding_percentage_max or 50
+        amount_requested = int(average_budget * funding_pct / 100)
+
+        prompt = f"""Tu es un expert en rédaction de dossiers de demande de subvention pour les petites communes françaises rurales.
+Tu dois générer un DOSSIER DE CANDIDATURE COMPLET et PERSUASIF, pas un simple template.
+
+═══════════════════════════════════════════════════════════════
+PROJET
+═══════════════════════════════════════════════════════════════
+• Titre : {project_title}
+• Description : {project_description or "Projet de développement local"}
+• Thématiques : {', '.join(project_themes) if project_themes else "Développement rural"}
+• Budget : {budget_min:,}€ à {budget_max:,}€
+• Durée : {timeline} mois
+• Premières étapes : {', '.join(first_steps) if first_steps else "Études préalables, consultation entreprises"}
+
+═══════════════════════════════════════════════════════════════
+COMMUNE
+═══════════════════════════════════════════════════════════════
+• Nom : {village_name}
+• Population : {village_population:,} habitants
+• Région : {village_region or "France rurale"}
+
+═══════════════════════════════════════════════════════════════
+PROGRAMME DE FINANCEMENT
+═══════════════════════════════════════════════════════════════
+• Nom : {program.name}
+• Organisme : {program.organization}
+• Montant finançable : {program.amount_min or 0:,}€ à {program.amount_max or 0:,}€
+• Taux : {program.funding_percentage_min or '?'}% à {program.funding_percentage_max or '?'}%
+• Exigences : {program.requirements or "Voir règlement"}
+• Documents requis : {program.required_documents or "Délibération, devis, RIB"}
+
+• Montant demandé estimé : {amount_requested:,}€
+
+{f'''═══════════════════════════════════════════════════════════════
+NOTES DE RECHERCHE PRÉALABLE
+═══════════════════════════════════════════════════════════════
+{research_notes}
+''' if research_notes else ''}
+
+═══════════════════════════════════════════════════════════════
+MISSION CRITIQUE
+═══════════════════════════════════════════════════════════════
+
+GÉNÈRE UN DOSSIER COMPLET ET CONVAINCANT avec du contenu réel, pas des placeholders.
+
+RÈGLES STRICTES :
+1. ÉCRIS DES PARAGRAPHES NARRATIFS COMPLETS - pas de listes à puces vides
+2. INVENTE des détails réalistes et cohérents basés sur le contexte
+3. UTILISE "[À COMPLÉTER]" UNIQUEMENT pour : numéros SIRET, téléphone, email, adresses précises, noms de personnes
+4. RÉDIGE des arguments persuasifs pour justifier le financement
+5. INCLUS des chiffres réalistes estimés (bénéficiaires, emplois, visiteurs)
+
+STRUCTURE OBLIGATOIRE avec CONTENU RÉDIGÉ :
+
+# 1. EN-TÊTE DU DOSSIER
+Rédige avec : nom commune, "Demande de subvention {program.name}", date
+
+# 2. OBJET DE LA DEMANDE (2 paragraphes minimum)
+- Présentation claire du projet
+- Montant sollicité et justification
+
+# 3. PRÉSENTATION DE LA COMMUNE (3-4 paragraphes)
+- Écris une vraie description géographique et historique (invente des détails plausibles)
+- Contexte démographique avec tendances réalistes
+- Enjeux économiques et sociaux de la commune rurale
+
+# 4. DESCRIPTION DÉTAILLÉE DU PROJET (5-6 paragraphes)
+- Contexte et genèse : RACONTE une histoire, pourquoi ce projet est né
+- Objectifs précis avec indicateurs chiffrés
+- Description technique des travaux/actions
+- Public bénéficiaire avec estimations chiffrées
+- Impact attendu sur le territoire
+
+# 5. PLAN DE FINANCEMENT (tableaux avec chiffres)
+- Tableau des dépenses AVEC montants estimés réalistes
+- Tableau des recettes incluant la subvention demandée
+- Justification de la capacité d'autofinancement
+
+# 6. CALENDRIER DE RÉALISATION (tableau avec dates)
+- Phases précises avec durées estimées
+- Points de contrôle et livrables
+
+# 7. INDICATEURS DE RÉSULTATS
+- Indicateurs quantitatifs CHIFFRÉS
+- Modalités d'évaluation concrètes
+
+# 8. PIÈCES À JOINDRE
+- Liste cochée des documents requis
+
+IMPORTANT : Le dossier doit être prêt à l'emploi, persuasif, et nécessiter uniquement de remplir les données administratives (SIRET, contacts). Le reste doit être du contenu rédigé et argumenté."""
+
+        # Call Claude API
+        message = self.client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=6000,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        return {
+            'draft_content': message.content[0].text,
+            'project_id': project_id,
+            'program_id': program_id,
+            'project_title': project_title,
+            'program_name': program.name,
+            'amount_requested': amount_requested
         }

@@ -10,6 +10,7 @@ import React, { useState, useEffect } from 'react';
 import GrantApplicationCard from './GrantApplicationCard';
 import GrantMatcher from './GrantMatcher';
 import GrantProgramDetail from './GrantProgramDetail';
+import GrantApplicationDetail from './GrantApplicationDetail';
 import './grants.css';
 
 const STATUS_ORDER = ['draft', 'preparing', 'submitted', 'under_review', 'approved', 'rejected', 'abandoned'];
@@ -24,6 +25,7 @@ export default function GrantApplicationList({
   const [error, setError] = useState(null);
   const [showMatcher, setShowMatcher] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [editingApplication, setEditingApplication] = useState(null);
   const [statusUpdateApp, setStatusUpdateApp] = useState(null);
   const [newStatus, setNewStatus] = useState('');
   const [updating, setUpdating] = useState(false);
@@ -41,7 +43,7 @@ export default function GrantApplicationList({
     try {
       const response = await fetch(`/api/grants/applications?project_id=${projectId}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch applications');
+        throw new Error('Échec du chargement des dossiers');
       }
       const data = await response.json();
 
@@ -74,8 +76,8 @@ export default function GrantApplicationList({
   };
 
   const handleViewDetails = (application) => {
-    // Open program detail drawer
-    setSelectedApplication(application);
+    // Open application detail view directly
+    setEditingApplication(application);
   };
 
   const handleUpdateStatus = (application) => {
@@ -95,14 +97,14 @@ export default function GrantApplicationList({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update status');
+        throw new Error('Échec de la mise à jour du statut');
       }
 
       await fetchApplications();
       setStatusUpdateApp(null);
     } catch (err) {
       console.error('Error updating status:', err);
-      alert('Failed to update status. Please try again.');
+      alert('Échec de la mise à jour du statut. Veuillez réessayer.');
     } finally {
       setUpdating(false);
     }
@@ -123,7 +125,7 @@ export default function GrantApplicationList({
     return (
       <div className="grant-loading">
         <div className="grant-loading-spinner" />
-        Loading applications...
+        Chargement des dossiers...
       </div>
     );
   }
@@ -132,10 +134,10 @@ export default function GrantApplicationList({
     return (
       <div className="grant-empty-state">
         <div className="grant-empty-state-icon">⚠️</div>
-        <h4>Unable to load applications</h4>
+        <h4>Impossible de charger les dossiers</h4>
         <p>{error}</p>
         <button className="grant-btn grant-btn-primary" onClick={fetchApplications}>
-          Try Again
+          Réessayer
         </button>
       </div>
     );
@@ -146,7 +148,7 @@ export default function GrantApplicationList({
       {/* Header */}
       <div className="grant-applications-header">
         <h3>
-          💰 Grant Applications
+          💰 Dossiers de subvention
           <span className="grant-applications-count">
             ({applications.length})
           </span>
@@ -155,7 +157,7 @@ export default function GrantApplicationList({
           className="grant-btn grant-btn-primary"
           onClick={() => setShowMatcher(true)}
         >
-          + Explore Funding Options
+          + Explorer les financements
         </button>
       </div>
 
@@ -174,7 +176,7 @@ export default function GrantApplicationList({
             fontSize: '14px'
           }}>
             <span style={{ color: '#008080', fontWeight: 600 }}>{stats.inProgress}</span>
-            <span style={{ color: '#6B7280' }}> in progress</span>
+            <span style={{ color: '#6B7280' }}> en cours</span>
           </div>
           <div style={{
             padding: '12px 16px',
@@ -183,7 +185,7 @@ export default function GrantApplicationList({
             fontSize: '14px'
           }}>
             <span style={{ color: '#7C3AED', fontWeight: 600 }}>{stats.submitted}</span>
-            <span style={{ color: '#6B7280' }}> submitted</span>
+            <span style={{ color: '#6B7280' }}> soumis</span>
           </div>
           {stats.approved > 0 && (
             <div style={{
@@ -192,8 +194,8 @@ export default function GrantApplicationList({
               borderRadius: '8px',
               fontSize: '14px'
             }}>
-              <span style={{ color: '#059669', fontWeight: 600 }}>€{stats.totalApproved.toLocaleString()}</span>
-              <span style={{ color: '#6B7280' }}> approved</span>
+              <span style={{ color: '#059669', fontWeight: 600 }}>{stats.totalApproved.toLocaleString()} €</span>
+              <span style={{ color: '#6B7280' }}> approuvés</span>
             </div>
           )}
         </div>
@@ -203,13 +205,13 @@ export default function GrantApplicationList({
       {applications.length === 0 ? (
         <div className="grant-empty-state">
           <div className="grant-empty-state-icon">📋</div>
-          <h4>No funding applications yet</h4>
-          <p>Start by exploring funding opportunities that match this project!</p>
+          <h4>Aucun dossier de financement</h4>
+          <p>Commencez par explorer les opportunités de financement pour ce projet !</p>
           <button
             className="grant-btn grant-btn-primary"
             onClick={() => setShowMatcher(true)}
           >
-            Explore Funding Options
+            Explorer les financements
           </button>
         </div>
       ) : (
@@ -237,14 +239,14 @@ export default function GrantApplicationList({
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontSize: '20px' }}>
-                    {application.funding_program?.organization?.toLowerCase().includes('europ') ? '🌿' : '🏛️'}
+                    {application.program_organization?.toLowerCase().includes('europ') ? '🌿' : '🏛️'}
                   </span>
                   <div>
                     <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#1F2937', margin: 0 }}>
-                      {application.funding_program?.name || 'Unknown Program'}
+                      {application.program_name || 'Programme inconnu'}
                     </h4>
                     <div style={{ fontSize: '14px', color: '#6B7280' }}>
-                      {application.funding_program?.organization || ''}
+                      {application.program_organization || ''}
                     </div>
                   </div>
                 </div>
@@ -262,14 +264,14 @@ export default function GrantApplicationList({
                          application.status === 'submitted' ? '#7C3AED' :
                          '#6B7280'
                 }}>
-                  {application.status === 'draft' ? '🔍 Researching' :
-                   application.status === 'preparing' ? '📝 Preparing' :
-                   application.status === 'submitted' ? '📤 Submitted' :
+                  {application.status === 'draft' ? '🔍 Recherche' :
+                   application.status === 'preparing' ? '📝 Préparation' :
+                   application.status === 'submitted' ? '📤 Soumis' :
                    application.status}
                 </span>
               </div>
               <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>
-                Created: {new Date(application.created_at).toLocaleDateString()}
+                Créé le : {new Date(application.created_at).toLocaleDateString('fr-FR')}
               </div>
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button
@@ -285,7 +287,7 @@ export default function GrantApplicationList({
                     cursor: 'pointer'
                   }}
                 >
-                  View Details
+                  Voir les détails
                 </button>
                 <button
                   className="grant-btn grant-btn-ghost grant-btn-small"
@@ -300,7 +302,7 @@ export default function GrantApplicationList({
                     cursor: 'pointer'
                   }}
                 >
-                  Update Status
+                  Modifier le statut
                 </button>
               </div>
             </div>
@@ -327,7 +329,11 @@ export default function GrantApplicationList({
           }}
           project={project}
           onClose={() => setSelectedApplication(null)}
-          onStartApplication={() => setSelectedApplication(null)}
+          onStartApplication={() => {
+            // Open the application detail view for editing
+            setEditingApplication(selectedApplication);
+            setSelectedApplication(null);
+          }}
         />
       )}
 
@@ -343,7 +349,7 @@ export default function GrantApplicationList({
             style={{ maxWidth: '400px' }}
           >
             <div className="grant-modal-header">
-              <h2>Update Status</h2>
+              <h2>Modifier le statut</h2>
               <button
                 className="grant-modal-close"
                 onClick={() => setStatusUpdateApp(null)}
@@ -353,20 +359,20 @@ export default function GrantApplicationList({
             </div>
             <div className="grant-modal-content">
               <div className="grant-form-group">
-                <label className="grant-form-label">New Status</label>
+                <label className="grant-form-label">Nouveau statut</label>
                 <select
                   className="grant-form-input"
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
                   style={{ width: '100%' }}
                 >
-                  <option value="draft">🔍 Researching</option>
-                  <option value="preparing">📝 Preparing</option>
-                  <option value="submitted">📤 Submitted</option>
-                  <option value="under_review">🔍 Under Review</option>
-                  <option value="approved">✅ Approved</option>
-                  <option value="rejected">❌ Rejected</option>
-                  <option value="abandoned">🗑️ Abandoned</option>
+                  <option value="draft">🔍 Recherche</option>
+                  <option value="preparing">📝 Préparation</option>
+                  <option value="submitted">📤 Soumis</option>
+                  <option value="under_review">🔍 En cours d'examen</option>
+                  <option value="approved">✅ Approuvé</option>
+                  <option value="rejected">❌ Refusé</option>
+                  <option value="abandoned">🗑️ Abandonné</option>
                 </select>
               </div>
             </div>
@@ -375,18 +381,28 @@ export default function GrantApplicationList({
                 className="grant-btn grant-btn-ghost"
                 onClick={() => setStatusUpdateApp(null)}
               >
-                Cancel
+                Annuler
               </button>
               <button
                 className="grant-btn grant-btn-primary"
                 onClick={submitStatusUpdate}
                 disabled={updating}
               >
-                {updating ? 'Updating...' : 'Update Status'}
+                {updating ? 'Mise à jour...' : 'Modifier le statut'}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Application Detail Modal */}
+      {editingApplication && (
+        <GrantApplicationDetail
+          application={editingApplication}
+          project={project}
+          onClose={() => setEditingApplication(null)}
+          onUpdate={fetchApplications}
+        />
       )}
     </div>
   );

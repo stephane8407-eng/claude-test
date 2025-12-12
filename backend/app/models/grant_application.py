@@ -2,7 +2,7 @@
 GrantApplication model - Track grant applications for project instances
 
 Tracks the lifecycle of grant applications:
-  draft → submitted → under_review → approved/rejected/abandoned
+  draft → researching → preparing → submitted → under_review → approved/rejected/abandoned
 """
 from sqlalchemy import Column, Integer, String, Text, TIMESTAMP, ForeignKey, Date
 from sqlalchemy.dialects.postgresql import JSONB
@@ -18,7 +18,7 @@ class GrantApplication(Base):
     __tablename__ = "grant_applications"
 
     id = Column(Integer, primary_key=True, index=True)
-    project_instance_id = Column(Integer, ForeignKey('project_instances.id', ondelete='CASCADE'), nullable=False)
+    project_id = Column(Integer, ForeignKey('project_instances.id', ondelete='CASCADE'), nullable=False)
     funding_program_id = Column(Integer, ForeignKey('funding_programs.id', ondelete='SET NULL'))
 
     # Application status
@@ -27,6 +27,8 @@ class GrantApplication(Base):
 
     # Generated content (from Claude API)
     generated_content = Column(Text)  # Full application text
+    ai_research = Column(Text)  # AI-generated eligibility research
+    ai_draft = Column(Text)  # AI-generated application draft
 
     # Submission details
     amount_requested = Column(Integer)  # Euros
@@ -48,11 +50,12 @@ class GrantApplication(Base):
     updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
 
     # Relationships
-    project_instance = relationship("ProjectInstance", back_populates="grant_applications")
+    project = relationship("ProjectInstance", back_populates="grant_applications", foreign_keys=[project_id])
     funding_program = relationship("FundingProgram", back_populates="grant_applications")
 
     # Valid status values
-    VALID_STATUSES = ['draft', 'submitted', 'under_review', 'approved', 'rejected', 'abandoned']
+    # Workflow: draft → researching → preparing → submitted → under_review → approved/rejected/abandoned
+    VALID_STATUSES = ['draft', 'researching', 'preparing', 'submitted', 'under_review', 'approved', 'rejected', 'abandoned']
 
     def __repr__(self):
         return f"<GrantApplication(id={self.id}, project_instance_id={self.project_instance_id}, status='{self.status}')>"
@@ -61,10 +64,12 @@ class GrantApplication(Base):
         """Convert to dictionary for API responses."""
         return {
             "id": self.id,
-            "project_instance_id": self.project_instance_id,
+            "project_id": self.project_id,
             "funding_program_id": self.funding_program_id,
             "status": self.status,
             "generated_content": self.generated_content,
+            "ai_research": self.ai_research,
+            "ai_draft": self.ai_draft,
             "amount_requested": self.amount_requested,
             "amount_approved": self.amount_approved,
             "submitted_date": self.submitted_date.isoformat() if self.submitted_date else None,

@@ -7,42 +7,42 @@ import React from 'react';
 
 const STATUS_CONFIG = {
   researching: {
-    label: 'Researching',
+    label: 'Recherche',
     emoji: '🔍',
     className: 'status-researching'
   },
   draft: {
-    label: 'Draft',
+    label: 'Brouillon',
     emoji: '📝',
     className: 'status-preparing'
   },
   preparing: {
-    label: 'Preparing',
+    label: 'Préparation',
     emoji: '📝',
     className: 'status-preparing'
   },
   submitted: {
-    label: 'Submitted',
+    label: 'Soumis',
     emoji: '📤',
     className: 'status-submitted'
   },
   under_review: {
-    label: 'Under Review',
+    label: 'En cours d\'examen',
     emoji: '🔍',
     className: 'status-under_review'
   },
   approved: {
-    label: 'Approved',
+    label: 'Approuvé',
     emoji: '✅',
     className: 'status-approved'
   },
   rejected: {
-    label: 'Rejected',
+    label: 'Refusé',
     emoji: '❌',
     className: 'status-rejected'
   },
   abandoned: {
-    label: 'Abandoned',
+    label: 'Abandonné',
     emoji: '🗑️',
     className: 'status-abandoned'
   }
@@ -50,15 +50,15 @@ const STATUS_CONFIG = {
 
 const DEADLINE_CONFIG = {
   rolling: {
-    label: 'Rolling',
+    label: 'Continu',
     className: 'grant-badge-rolling'
   },
   annual: {
-    label: 'Annual',
+    label: 'Annuel',
     className: 'grant-badge-annual'
   },
   deadline: {
-    label: 'Deadline',
+    label: 'Date limite',
     className: 'grant-badge-deadline'
   }
 };
@@ -78,13 +78,13 @@ export function EligibilityBadge({ eligible }) {
   if (eligible) {
     return (
       <span className="grant-badge grant-badge-eligible">
-        ✓ Eligible
+        ✓ Éligible
       </span>
     );
   }
   return (
     <span className="grant-badge grant-badge-check">
-      Check eligibility
+      Vérifier l'éligibilité
     </span>
   );
 }
@@ -93,7 +93,7 @@ export function DeadlineBadge({ deadlineType, deadlineDate }) {
   if (deadlineType === 'rolling') {
     return (
       <span className="grant-badge grant-badge-rolling">
-        Rolling applications
+        Candidature continue
       </span>
     );
   }
@@ -101,21 +101,21 @@ export function DeadlineBadge({ deadlineType, deadlineDate }) {
   if (deadlineType === 'annual') {
     return (
       <span className="grant-badge grant-badge-annual">
-        Annual deadline
+        Date limite annuelle
       </span>
     );
   }
 
   if (deadlineDate) {
     const date = new Date(deadlineDate);
-    const formatted = date.toLocaleDateString('en-GB', {
-      month: 'short',
+    const formatted = date.toLocaleDateString('fr-FR', {
       day: 'numeric',
+      month: 'short',
       year: 'numeric'
     });
     return (
       <span className="grant-badge grant-badge-deadline">
-        Deadline: {formatted}
+        Date limite : {formatted}
       </span>
     );
   }

@@ -5,7 +5,8 @@
  * NO blue gradients, NO AI terminology, NO confidence scores.
  */
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { MainLayout } from '../components/layout/index';
 import { villageAPI, poiAPI } from '../services/api';
 import { VillageMap } from '../components/village/VillageMap';
@@ -15,6 +16,7 @@ import './VillagePage.css';
 
 export function VillagePage() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const [village, setVillage] = useState(null);
   const [pois, setPois] = useState([]);
   const [routes, setRoutes] = useState([]);
@@ -77,6 +79,30 @@ export function VillagePage() {
   return (
     <MainLayout>
       <div className="spv-village">
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="spv-village__back-button"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            color: '#0d9488',
+            background: 'none',
+            border: 'none',
+            padding: '12px 16px',
+            cursor: 'pointer',
+            fontSize: '15px',
+            fontWeight: 500,
+            transition: 'color 0.2s'
+          }}
+          onMouseEnter={(e) => e.target.style.color = '#0f766e'}
+          onMouseLeave={(e) => e.target.style.color = '#0d9488'}
+        >
+          <ArrowLeftIcon style={{ width: '20px', height: '20px' }} />
+          <span>Retour</span>
+        </button>
+
         {/* Header - Clean white, no gradient */}
         <header className="spv-village__header">
           <div className="spv-village__header-content">
