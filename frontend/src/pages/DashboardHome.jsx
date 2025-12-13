@@ -200,17 +200,17 @@ export function DashboardHome() {
                   </div>
                 )}
 
-                <div className="flex flex-wrap gap-6">
+                <div className="flex flex-wrap gap-8">
                   <button
                     onClick={() => navigate(`/villages/${user.village_slug}`)}
-                    className="flex items-center gap-4 px-10 py-5 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors font-medium shadow-sm cursor-pointer text-lg"
+                    className="flex items-center gap-4 px-12 py-6 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors font-medium shadow-sm cursor-pointer text-lg"
                   >
                     <EyeIcon className="w-6 h-6" />
                     Voir la page village
                   </button>
                   <button
                     onClick={() => navigate('/dashboard/identity-audit')}
-                    className="flex items-center gap-4 px-10 py-5 border-2 border-gray-300 text-gray-700 rounded-xl hover:border-teal-500 hover:text-teal-600 transition-colors font-medium bg-white cursor-pointer text-lg"
+                    className="flex items-center gap-4 px-12 py-6 border-2 border-gray-300 text-gray-700 rounded-xl hover:border-teal-500 hover:text-teal-600 transition-colors font-medium bg-white cursor-pointer text-lg"
                   >
                     <ArrowPathIcon className="w-6 h-6" />
                     Régénérer
@@ -227,7 +227,7 @@ export function DashboardHome() {
                 </p>
                 <button
                   onClick={() => navigate('/dashboard/identity-audit')}
-                  className="inline-flex items-center gap-4 px-12 py-6 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors font-medium shadow-sm cursor-pointer text-xl"
+                  className="inline-flex items-center gap-4 px-16 py-8 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors font-medium shadow-sm cursor-pointer text-xl"
                 >
                   <SparklesIcon className="w-7 h-7" />
                   Créer mon identité
@@ -295,10 +295,10 @@ export function DashboardHome() {
             {/* Add POI */}
             <button
               onClick={() => navigate('/dashboard/pois?action=create')}
-              className="bg-white rounded-2xl shadow-md p-10 hover:shadow-lg border-2 border-transparent hover:border-teal-400 transition-all duration-200 group cursor-pointer text-left"
+              className="bg-white rounded-2xl shadow-md p-12 hover:shadow-lg border-2 border-transparent hover:border-teal-400 transition-all duration-200 group cursor-pointer text-left"
             >
-              <div className="w-20 h-20 bg-teal-100 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-teal-200 transition-colors">
-                <MapPinIcon className="w-10 h-10 text-teal-600" />
+              <div className="w-24 h-24 bg-teal-100 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-teal-200 transition-colors">
+                <MapPinIcon className="w-12 h-12 text-teal-600" />
               </div>
               <p className="font-semibold text-gray-900 text-xl mb-4">Ajouter un POI</p>
               <p className="text-base text-gray-500 leading-relaxed">Créer un point d'intérêt</p>
@@ -307,10 +307,10 @@ export function DashboardHome() {
             {/* Generate QR */}
             <button
               onClick={() => navigate('/dashboard/qr-codes?action=generate')}
-              className="bg-white rounded-2xl shadow-md p-10 hover:shadow-lg border-2 border-transparent hover:border-blue-400 transition-all duration-200 group cursor-pointer text-left"
+              className="bg-white rounded-2xl shadow-md p-12 hover:shadow-lg border-2 border-transparent hover:border-blue-400 transition-all duration-200 group cursor-pointer text-left"
             >
-              <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-blue-200 transition-colors">
-                <QrCodeIcon className="w-10 h-10 text-blue-600" />
+              <div className="w-24 h-24 bg-blue-100 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-blue-200 transition-colors">
+                <QrCodeIcon className="w-12 h-12 text-blue-600" />
               </div>
               <p className="font-semibold text-gray-900 text-xl mb-4">Générer QR Code</p>
               <p className="text-base text-gray-500 leading-relaxed">Créer un code traçable</p>
@@ -319,10 +319,10 @@ export function DashboardHome() {
             {/* Projects */}
             <button
               onClick={() => navigate('/dashboard/projects')}
-              className="bg-white rounded-2xl shadow-md p-10 hover:shadow-lg border-2 border-transparent hover:border-orange-400 transition-all duration-200 group cursor-pointer text-left"
+              className="bg-white rounded-2xl shadow-md p-12 hover:shadow-lg border-2 border-transparent hover:border-orange-400 transition-all duration-200 group cursor-pointer text-left"
             >
-              <div className="w-20 h-20 bg-orange-100 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-orange-200 transition-colors">
-                <FolderIcon className="w-10 h-10 text-orange-600" />
+              <div className="w-24 h-24 bg-orange-100 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-orange-200 transition-colors">
+                <FolderIcon className="w-12 h-12 text-orange-600" />
               </div>
               <p className="font-semibold text-gray-900 text-xl mb-4">Mes Projets</p>
               <p className="text-base text-gray-500 leading-relaxed">Gérer les projets village</p>
@@ -331,10 +331,10 @@ export function DashboardHome() {
             {/* Funding */}
             <button
               onClick={() => navigate('/dashboard/funding-programs')}
-              className="bg-white rounded-2xl shadow-md p-10 hover:shadow-lg border-2 border-transparent hover:border-green-400 transition-all duration-200 group cursor-pointer text-left"
+              className="bg-white rounded-2xl shadow-md p-12 hover:shadow-lg border-2 border-transparent hover:border-green-400 transition-all duration-200 group cursor-pointer text-left"
             >
-              <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-green-200 transition-colors">
-                <CurrencyEuroIcon className="w-10 h-10 text-green-600" />
+              <div className="w-24 h-24 bg-green-100 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-green-200 transition-colors">
+                <CurrencyEuroIcon className="w-12 h-12 text-green-600" />
               </div>
               <p className="font-semibold text-gray-900 text-xl mb-4">Financements</p>
               <p className="text-base text-gray-500 leading-relaxed">Trouver des subventions</p>
@@ -344,18 +344,18 @@ export function DashboardHome() {
         </div>
 
         {/* Help Section */}
-        <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl shadow-lg p-12 text-white">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-10">
-            <div className="flex items-center gap-8">
-              <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center">
-                <DocumentTextIcon className="w-10 h-10 text-white" />
+        <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl shadow-lg p-16 text-white">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+            <div className="flex items-center gap-10">
+              <div className="w-24 h-24 bg-white/10 rounded-2xl flex items-center justify-center">
+                <DocumentTextIcon className="w-12 h-12 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-2xl mb-3">Besoin d'aide ?</h3>
+                <h3 className="font-bold text-2xl mb-4">Besoin d'aide ?</h3>
                 <p className="text-gray-300 text-lg leading-relaxed">Consultez notre guide de démarrage rapide</p>
               </div>
             </div>
-            <button className="px-10 py-5 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-colors font-medium text-lg whitespace-nowrap cursor-pointer">
+            <button className="px-12 py-6 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-colors font-medium text-lg whitespace-nowrap cursor-pointer">
               Voir le guide
             </button>
           </div>
