@@ -48,6 +48,7 @@ body {
   .p-10 { padding: 3rem !important; }
   .p-12 { padding: 4rem !important; }
   .p-16 { padding: 5rem !important; }
+  .px-8 { padding-left: 2rem !important; padding-right: 2rem !important; }
   .px-10 { padding-left: 3rem !important; padding-right: 3rem !important; }
   .px-12 { padding-left: 4rem !important; padding-right: 4rem !important; }
   .px-16 { padding-left: 5rem !important; padding-right: 5rem !important; }

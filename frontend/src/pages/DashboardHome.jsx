@@ -87,7 +87,7 @@ export function DashboardHome() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
+      <div className="max-w-7xl mx-auto px-8 sm:px-12 lg:px-16 py-8">
 
         {/* Header with Greeting */}
         <div className="mb-14">
