@@ -61,17 +61,19 @@ class QRCodeStats(BaseModel):
     recent_scans: List[dict]
 
 
-# Tier limits
+# Tier limits (generous for MVP testing)
 TIER_QR_LIMITS = {
-    'free': 0,
-    'lite': 5,
+    'free': 100,       # Allow 100 for MVP testing
+    'Free': 100,       # Alternative name
+    'Free Plan': 100,  # Another alternative
+    'lite': 100,
     'partner': 999999  # Unlimited
 }
 
 
 def check_qr_limit(village: Village, db: Session):
     """Check if village can create more QR codes"""
-    limit = TIER_QR_LIMITS.get(village.subscription_tier, 0)
+    limit = TIER_QR_LIMITS.get(village.subscription_tier, 100)  # Default to 100 for MVP
     current_count = db.query(func.count(QRCode.id)).filter(
         QRCode.village_id == village.id
     ).scalar()
@@ -116,33 +118,47 @@ def create_qr_code(
         is_active=True
     )
 
+    # Generate QR code image as base64 data URL
+    try:
+        generator = get_qr_generator()
+        # Full URL for scanning (use target_url for now, switch to scan_url in production)
+        scan_url = qr_data.target_url
+
+        # Generate as base64 data URL (works without file system)
+        qr_image_data_url = generator.generate_qr_code_data_url(
+            data=scan_url,
+            village_slug=village_slug,
+            size=QRCodeSize.MEDIUM,
+            village_settings=village.settings if hasattr(village, 'settings') else None
+        )
+
+        qr_code.qr_image_url = qr_image_data_url
+        logger.info(f"Generated QR code image for {code}")
+
+    except Exception as e:
+        logger.error(f"Failed to generate QR image: {e}")
+        # Generate a simple QR code as fallback
+        try:
+            import qrcode
+            import io
+            import base64
+
+            qr = qrcode.QRCode(version=1, box_size=10, border=4)
+            qr.add_data(qr_data.target_url)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+
+            buffered = io.BytesIO()
+            img.save(buffered, format="PNG")
+            img_base64 = base64.b64encode(buffered.getvalue()).decode()
+            qr_code.qr_image_url = f"data:image/png;base64,{img_base64}"
+            logger.info(f"Generated fallback QR code for {code}")
+        except Exception as e2:
+            logger.error(f"Fallback QR generation also failed: {e2}")
+
     db.add(qr_code)
     db.commit()
     db.refresh(qr_code)
-
-    # Generate QR code images
-    try:
-        generator = get_qr_generator()
-        # Full URL for scanning
-        scan_url = f"https://spvtreasurehunt.com/api/qr/{code}"
-
-        paths = generator.generate_and_save_qr_code(
-            data=scan_url,
-            qr_code=code,
-            village_slug=village_slug,
-            village_settings=village.settings
-        )
-
-        # Save medium size path to database
-        qr_code.qr_image_url = paths.get(QRCodeSize.MEDIUM)
-        db.commit()
-        db.refresh(qr_code)
-
-        logger.info(f"Created QR code {code} for village {village_slug}")
-
-    except Exception as e:
-        logger.error(f"Failed to generate QR images: {e}")
-        # Don't fail the request, image can be regenerated
 
     return qr_code
 
@@ -195,10 +211,13 @@ def delete_qr_code(
     current_user: User = Depends(get_current_user)
 ):
     """Delete a QR code"""
+    from sqlalchemy import delete as sql_delete
+
     village = db.query(Village).filter(Village.slug == village_slug).first()
     if not village:
         raise HTTPException(status_code=404, detail="Village not found")
 
+    # Check if QR code exists
     qr_code = db.query(QRCode).filter(
         and_(QRCode.id == qr_id, QRCode.village_id == village.id)
     ).first()
@@ -206,7 +225,10 @@ def delete_qr_code(
     if not qr_code:
         raise HTTPException(status_code=404, detail="QR code not found")
 
-    db.delete(qr_code)
+    # Delete using SQL statement to bypass relationship loading
+    db.execute(
+        sql_delete(QRCode).where(QRCode.id == qr_id)
+    )
     db.commit()
 
     return {"message": "QR code deleted"}

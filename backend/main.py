@@ -124,7 +124,7 @@ app.include_router(villages_router)
 app.include_router(pois_router)
 app.include_router(identity.router)
 app.include_router(auth_router)
-app.include_router(qr_codes_router)
+app.include_router(qr_codes_router, prefix="/api", tags=["qr_codes"])
 
 # V1 Product Spec - New routers
 app.include_router(topics_router)

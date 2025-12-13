@@ -8,7 +8,7 @@ import { VillagePage } from './pages/VillagePage';
 import { DashboardLayout } from './components/dashboard/DashboardLayout';
 import { DashboardHome } from './pages/DashboardHome';
 import { DesignSystemPage } from './pages/DesignSystemPage';
-import { IdentityAuditWizard, CaseStudiesPage, FundingProgramsPage, ProjectKanbanPage } from './pages/admin';
+import { IdentityAuditWizard, CaseStudiesPage, FundingProgramsPage, ProjectKanbanPage, QRCodesPage } from './pages/admin';
 import './App.css';
 import './components/grants/grants.css';
 
@@ -44,6 +44,8 @@ function App() {
             <Route path="funding-programs" element={<FundingProgramsPage />} />
             {/* Phase E: Project Management Dashboard */}
             <Route path="projects" element={<ProjectKanbanPage />} />
+            {/* QR Code Management */}
+            <Route path="qr-codes" element={<QRCodesPage />} />
           </Route>
 
           {/* 404 - Not Found */}

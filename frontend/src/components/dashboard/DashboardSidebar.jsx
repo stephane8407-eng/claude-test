@@ -16,11 +16,11 @@ const mainNavigation = [
   { name: 'Tableau de bord', href: '/dashboard', icon: HomeIcon },
   { name: 'Gestion de Projets', href: '/dashboard/projects', icon: FolderIcon },
   { name: 'Audit Identité', href: '/dashboard/identity-audit', icon: SparklesIcon },
+  { name: 'QR Codes', href: '/dashboard/qr-codes', icon: QrCodeIcon },
 ];
 
 const comingSoonNavigation = [
   { name: 'Points d\'intérêt', href: '/dashboard/pois', icon: MapPinIcon },
-  { name: 'QR Codes', href: '/dashboard/qr-codes', icon: QrCodeIcon },
   { name: 'Analyses', href: '/dashboard/analytics', icon: ChartBarIcon },
   { name: 'Paramètres', href: '/dashboard/settings', icon: Cog6ToothIcon },
 ];

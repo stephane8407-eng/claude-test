@@ -10,3 +10,6 @@ export { FundingProgramsPage } from './FundingProgramsPage';
 
 // Phase E: Project Management Dashboard
 export { ProjectKanbanPage } from './ProjectKanbanPage';
+
+// QR Code Management
+export { default as QRCodesPage } from './QRCodesPage';
