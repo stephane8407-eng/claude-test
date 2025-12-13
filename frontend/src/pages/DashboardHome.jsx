@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
-import { analyticsAPI } from '../services/api';
+import { analyticsAPI, identityAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export function DashboardHome() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [savedIdentity, setSavedIdentity] = useState(null);
+  const [identityLoading, setIdentityLoading] = useState(true);
 
   useEffect(() => {
     loadStats();
+    loadIdentity();
   }, []);
 
   const loadStats = async () => {
@@ -20,6 +24,18 @@ export function DashboardHome() {
       console.error('Failed to load stats:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadIdentity = async () => {
+    try {
+      const data = await identityAPI.getIdentity(user.village_slug);
+      setSavedIdentity(data);
+    } catch (error) {
+      // No identity found - that's OK
+      setSavedIdentity(null);
+    } finally {
+      setIdentityLoading(false);
     }
   };
 
@@ -46,6 +62,68 @@ export function DashboardHome() {
           value={stats?.totalScans || 0}
           color="purple"
         />
+      </div>
+
+      {/* Village Identity Widget */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          Mon Identité Village
+        </h2>
+
+        {identityLoading ? (
+          <p className="text-gray-500">Chargement...</p>
+        ) : savedIdentity ? (
+          <div>
+            <p className="text-sm text-gray-500 mb-2">
+              Dernière mise à jour: {new Date(savedIdentity.updated_at).toLocaleDateString('fr-FR')}
+            </p>
+
+            <p className="text-gray-700 line-clamp-3 mb-4">
+              {savedIdentity.identity_summary?.substring(0, 200)}
+              {savedIdentity.identity_summary?.length > 200 ? '...' : ''}
+            </p>
+
+            {savedIdentity.selected_themes?.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {savedIdentity.selected_themes.slice(0, 3).map((theme, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full"
+                  >
+                    {theme.theme_name}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => navigate(`/villages/${user.village_slug}`)}
+                className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm"
+              >
+                Voir la page village
+              </button>
+              <button
+                onClick={() => navigate('/dashboard/identity-audit')}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm"
+              >
+                Régénérer
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <p className="text-gray-600 mb-4">
+              Aucune identité générée pour votre village.
+            </p>
+            <button
+              onClick={() => navigate('/dashboard/identity-audit')}
+              className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm"
+            >
+              Créer mon identité
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Quick Actions */}
